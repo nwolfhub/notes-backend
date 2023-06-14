@@ -1,8 +1,10 @@
 package org.nwolfhub.notes.model;
 
 import jakarta.persistence.*;
+import org.nwolfhub.utils.Utils;
 
 import java.io.Serializable;
+import java.security.NoSuchAlgorithmException;
 
 @Entity
 @Table(name = "users", schema = "notes")
@@ -14,14 +16,22 @@ public class User implements Serializable {
 
     public String username;
     public String name;
-    public String hash1;
-    public String hash2;
+    public String salt1;
+    public String salt2;
     public String password;
 
     public boolean isBanned;
 
     public User() {
 
+    }
+
+    public User(String username, String password) throws NoSuchAlgorithmException {
+        this.username = username;
+        this.name = username;
+        this.salt1 = Utils.generateString(40);
+        this.salt2 = Utils.generateString(20);
+        this.password = Utils.hashString(salt1 + password + salt2);
     }
 
     public Integer getId() {
@@ -51,21 +61,21 @@ public class User implements Serializable {
         return this;
     }
 
-    public String getHash1() {
-        return hash1;
+    public String getSalt1() {
+        return salt1;
     }
 
-    public User setHash1(String hash1) {
-        this.hash1 = hash1;
+    public User setSalt1(String salt1) {
+        this.salt1 = salt1;
         return this;
     }
 
-    public String getHash2() {
-        return hash2;
+    public String getSalt2() {
+        return salt2;
     }
 
-    public User setHash2(String hash2) {
-        this.hash2 = hash2;
+    public User setSalt2(String salt2) {
+        this.salt2 = salt2;
         return this;
     }
 
