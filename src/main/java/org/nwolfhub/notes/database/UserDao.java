@@ -2,6 +2,7 @@ package org.nwolfhub.notes.database;
 
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.hibernate.query.Query;
 import org.nwolfhub.notes.model.User;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
@@ -18,6 +19,12 @@ public class UserDao {
         User user = session.get(User.class, id);
         session.close();
         return user;
+    }
+    public User getUser(String username) {
+        Session session = controller.getSessionFactory().openSession();
+        Query query = session.createQuery("from User where username=:username")
+                .setParameter("username", username);
+        return (User) query.uniqueResult();
     }
     public void setObject(Object o) {
         Session session = controller.getSessionFactory().openSession();

@@ -23,9 +23,15 @@ public class Configurator {
             String text = """
                     db_url=127.0.0.1
                     db_port=5432
-                    db_name=projects
+                    db_name=notes
                     db_username=user
                     db_password=password
+                    use_redis=true
+                    redis_db_id=1
+                    redis_url=127.0.0.1
+                    redis_port=6379
+                    redis_user=default
+                    redis_password=password
                     users_dir=users""";
             out.write(text.getBytes(StandardCharsets.UTF_8));
             out.flush(); out.close();
