@@ -19,6 +19,7 @@ public class User implements Serializable {
     public String salt1;
     public String salt2;
     public String password;
+    public String email;
 
     public boolean isBanned;
 
@@ -32,6 +33,7 @@ public class User implements Serializable {
         this.salt1 = Utils.generateString(40);
         this.salt2 = Utils.generateString(20);
         this.password = Utils.hashString(salt1 + password + salt2);
+        this.isBanned = false;
     }
 
     public Integer getId() {
@@ -83,8 +85,20 @@ public class User implements Serializable {
         return password;
     }
 
-    public User setPassword(String password) {
-        this.password = password;
+    public boolean validatePassword(String password) {
+        try {
+            if (Utils.hashString(salt1 + password + salt2).equals(this.password)) {
+                return true;
+            }
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public User setPassword(String password) throws NoSuchAlgorithmException {
+
+        this.password = Utils.hashString(salt1 + password + salt2);
         return this;
     }
 
@@ -94,6 +108,15 @@ public class User implements Serializable {
 
     public User setBanned(boolean banned) {
         isBanned = banned;
+        return this;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public User setEmail(String email) {
+        this.email = email;
         return this;
     }
 }

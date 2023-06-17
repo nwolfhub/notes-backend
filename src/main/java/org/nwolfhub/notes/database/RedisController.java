@@ -2,6 +2,7 @@ package org.nwolfhub.notes.database;
 
 import org.springframework.stereotype.Component;
 import redis.clients.jedis.Jedis;
+import redis.clients.jedis.args.FlushMode;
 
 @Component
 public class RedisController {
@@ -22,5 +23,8 @@ public class RedisController {
 
     public String get (String key) {
         return jedis.get(key);
+    }
+    public void cleanup() {
+        jedis.flushDB(FlushMode.ASYNC);
     }
 }
