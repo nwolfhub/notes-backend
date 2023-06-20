@@ -19,11 +19,24 @@ public class UserController {
         UserController.dao = dao;
     }
 
+    /**
+     * Logins a user with username and password provided in request body with following format:
+     * username=username
+     * password=password
+     * Possible returns:
+     * 200 {"token": "token"} in case of successful authentication
+     * 400 {"error": "Username or password is empty"} if no username and password were found in body
+     * 401 {"error": "error"} in all other cases
+     * @return see description
+     */
     @PostMapping("/login")
     public static ResponseEntity<String> login(@RequestBody String body) {
         HashMap<String, String> bodyValues = Utils.parseValues(body, "\n");
         String username = bodyValues.get("username");
         String password = bodyValues.get("password");
+        if (username==null || password==null) {
+            return ResponseEntity.status(400).body(JsonBuilder.buildFailOutput("Username or password is empty"));
+        }
         User requested = dao.getUser(username);
         if(requested!=null) {
             if(requested.validatePassword(password)) {
@@ -41,11 +54,24 @@ public class UserController {
         }
     }
 
+    /**
+     * registers a user with username and password provided in body with following format:
+     * username=username
+     * password=password
+     * Possible returns:
+     * 200 {"token": "token"} in case of successful authentication
+     * 400 {"error": "Username or password is empty"} if no username and password were found in body
+     * 401 {"error": "error"} in all other cases
+     * @return see description
+     */
     @PostMapping("/register")
     public static ResponseEntity<String> register(@RequestBody String body) {
         HashMap<String, String> bodyValues = Utils.parseValues(body, "\n");
         String username = bodyValues.get("username");
         String password = bodyValues.get("password");
+        if (username==null || password==null) {
+            return ResponseEntity.status(400).body(JsonBuilder.buildFailOutput("Username or password is empty"));
+        }
         User requested = dao.getUser(username);
         if(requested==null) {
             try {
@@ -60,12 +86,16 @@ public class UserController {
         } else return ResponseEntity.status(400).body(JsonBuilder.buildFailOutput("User " + username + " already exists"));
     }
 
+
     @PostMapping("/changepassword")
     public static ResponseEntity<String> changePassword(@RequestBody String body) {
         HashMap<String, String> bodyValues = Utils.parseValues(body, "\n");
         String username = bodyValues.get("username");
         String password = bodyValues.get("password");
         String newPassword = bodyValues.get("newPassword");
+        if (username==null || password==null || newPassword==null) {
+            return ResponseEntity.status(400).body(JsonBuilder.buildFailOutput("Username or password is empty"));
+        }
         User requested = dao.getUser(username);
         if(requested!=null) {
             if(requested.validatePassword(password)) {
