@@ -48,7 +48,7 @@ public class UserController {
                 }
 
             }
-            return ResponseEntity.status(401).body(JsonBuilder.buildFailOutput("Passwords didn't match"));
+            return ResponseEntity.status(401).body(JsonBuilder.buildFailOutput("Passwords didnt match"));
         } else {
             return ResponseEntity.status(401).body(JsonBuilder.buildFailOutput("User " + username + " does not exist"));
         }
@@ -106,7 +106,7 @@ public class UserController {
                     return ResponseEntity.status(500).body(JsonBuilder.buildFailOutput("Could not find hashing algorithm. Please contact administrator"));
                 }
             } else {
-                return ResponseEntity.status(401).body(JsonBuilder.buildFailOutput("Previous passwords didn't match"));
+                return ResponseEntity.status(401).body(JsonBuilder.buildFailOutput("Previous passwords didnt match"));
             }
         } else {
             return ResponseEntity.status(400).body(JsonBuilder.buildFailOutput("User " + username + " does not exits"));
