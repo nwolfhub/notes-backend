@@ -5,11 +5,13 @@ import org.nwolfhub.easycli.EasyCLI;
 import org.nwolfhub.easycli.model.FlexableValue;
 import org.nwolfhub.notes.api.NotesController;
 import org.nwolfhub.notes.api.UserController;
+import org.nwolfhub.notes.database.UserDao;
 import org.nwolfhub.notes.model.User;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
+import java.io.IOException;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
 
@@ -22,7 +24,8 @@ public class NotesApplication {
 		SpringApplication.run(NotesApplication.class, args);
 		NotesController.init();
 		AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(Configurator.class);
-		UserController.init(context.getBean());
+		UserController.init(context.getBean(UserDao.class));
+		NotesController.init();
 	}
 
 }

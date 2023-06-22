@@ -1,6 +1,7 @@
 package org.nwolfhub.notes;
 
 import org.nwolfhub.notes.database.HibernateController;
+import org.nwolfhub.notes.database.UserDao;
 import org.nwolfhub.utils.Utils;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -14,13 +15,9 @@ import java.util.Properties;
 
 @Configuration
 public class Configurator {
-    private static final org.nwolfhub.utils.Configurator configurator = new org.nwolfhub.utils.Configurator(false, new File("projects.cfg"));;
-    public static File createDemoConfig() throws IOException {
-        File configFile = new File("notes.cfg");
-        if (!configFile.exists()) {
-            configFile.createNewFile();
-            FileOutputStream out = new FileOutputStream(configFile);
-            String text = """
+    private static final org.nwolfhub.utils.Configurator configurator = new org.nwolfhub.utils.Configurator(new File("notes.cfg"), getDemoCfg());
+    public static String getDemoCfg() {
+        String text = """
                     cleanup_rate=12
                     db_url=127.0.0.1
                     db_port=5432
@@ -34,10 +31,7 @@ public class Configurator {
                     redis_user=default
                     redis_password=password
                     users_dir=users""";
-            out.write(text.getBytes(StandardCharsets.UTF_8));
-            out.flush(); out.close();
-        }
-        return configFile;
+        return text;
     }
 
     @Bean
@@ -62,6 +56,12 @@ public class Configurator {
     @Primary
     public static HibernateController getHibernateController() {
         return new HibernateController(getHibernateProps());
+    }
+
+    @Bean(name = "userDao")
+    @Primary
+    public static UserDao getDao() {
+        return new UserDao(getHibernateController());
     }
 
     public static String getEntry(String key) {

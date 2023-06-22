@@ -4,7 +4,6 @@ import org.springframework.stereotype.Component;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.args.FlushMode;
 
-@Component
 public class RedisController {
     private Jedis jedis;
 
