@@ -20,9 +20,9 @@ public class TokenController {
     public static void init() {
         String useRedis = Configurator.getEntry("use_redis");
         if (useRedis!=null && useRedis.equals("true")) {
-            Jedis jedis = new Jedis(Configurator.getEntry("redis_url"), Integer.valueOf(Configurator.getEntry("redis_port")));
-            jedis.select(Integer.parseInt(Configurator.getEntry("redis_db_id")));
+            Jedis jedis = new Jedis(Configurator.getEntry("redis_url"), Integer.parseInt(Configurator.getEntry("redis_port")));
             jedis.auth(Configurator.getEntry("redis_user"), Configurator.getEntry("redis_password"));
+            jedis.select(Integer.parseInt(Configurator.getEntry("redis_db_id")));
             jedis.flushDB(FlushMode.SYNC);
             lastCleanup = new Date().getTime();
             String rate = Configurator.getEntry("cleanup_rate");

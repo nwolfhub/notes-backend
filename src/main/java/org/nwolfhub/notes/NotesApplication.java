@@ -5,6 +5,7 @@ import org.nwolfhub.easycli.EasyCLI;
 import org.nwolfhub.easycli.model.FlexableValue;
 import org.nwolfhub.notes.api.NotesController;
 import org.nwolfhub.notes.api.UserController;
+import org.nwolfhub.notes.database.TokenController;
 import org.nwolfhub.notes.database.UserDao;
 import org.nwolfhub.notes.model.User;
 import org.springframework.boot.SpringApplication;
@@ -22,10 +23,10 @@ public class NotesApplication {
 	public static void main(String[] args) {
 		cli.addTemplate(Defaults.defaultTemplate);
 		SpringApplication.run(NotesApplication.class, args);
-		NotesController.init();
 		AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(Configurator.class);
-		UserController.init(context.getBean(UserDao.class));
 		NotesController.init();
+		TokenController.init();
+		UserController.init(context.getBean(UserDao.class));
 	}
 
 }
