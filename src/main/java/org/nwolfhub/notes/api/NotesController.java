@@ -1,15 +1,21 @@
 package org.nwolfhub.notes.api;
 
 import org.nwolfhub.easycli.Defaults;
+import org.nwolfhub.easycli.Main;
 import org.nwolfhub.notes.Configurator;
 import org.nwolfhub.notes.NotesApplication;
 import org.nwolfhub.notes.database.TokenController;
 import org.nwolfhub.notes.model.NoAuthException;
 import org.nwolfhub.notes.model.Note;
+import org.nwolfhub.notes.model.User;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 @RequestMapping("/api/notes")
 public class NotesController {
@@ -35,12 +41,19 @@ public class NotesController {
         }
     }
 
+    private static void validateUserDir(Integer id) throws IOException {
+        File userDir = new File(location + "/" + id + "/");
+        if(!userDir.exists()) {
+            userDir.createNewFile();
+        }
+    }
+
     public static void init() {
         validateDir();
     }
 
     @GetMapping("/getNote")
-    public static ResponseEntity<String> getNote(@RequestParam(name = "id") String id, @RequestHeader(name = "password", required = false, defaultValue = "") String password, @RequestHeader(name = "token") String token) {
+    public static ResponseEntity<String> getNote(@RequestParam(name = "name") String id, @RequestHeader(name = "password", required = false, defaultValue = "") String password, @RequestHeader(name = "token") String token) {
         Integer owner = TokenController.getUserId(token);
         if(owner==null) {
             return ResponseEntity.status(401).body(JsonBuilder.buildFailOutput("Token verification failed"));
@@ -71,29 +84,31 @@ public class NotesController {
     }
 
     @PostMapping("/setNote")
-    public static ResponseEntity<String> setNote(@RequestParam(name = "id") String id, @RequestHeader(name = "password", required = false, defaultValue = "") String password, @RequestBody() String body, @RequestParam(name = "encryption", defaultValue = "-1", required = false) String encryption, @RequestHeader(name = "updatePassword", defaultValue = "", required = false) String updatePassword, @RequestHeader(name = "token") String token) {
-        Integer owner = TokenController.getUserId(token);
+    public static ResponseEntity<String> setNote(@RequestParam(name = "name") String id, @RequestHeader(name = "password", required = false) String password, @RequestBody() String body, @RequestParam(name = "encryption", required = false) String encryption, @RequestHeader(name = "updatePassword", defaultValue = "", required = false) String updatePassword, @RequestHeader(name = "token") String token) {
+        User owner = TokenController.getUser(token);
         if (owner == null) {
             return ResponseEntity.status(401).body(JsonBuilder.buildFailOutput("Token verification failed"));
         }
-        File noteFile = new File(location + "/" + owner + "/" + id + ".note");
+        File noteFile = new File(location + "/" + owner.id + "/" + id + ".note");
+        try {
+            validateUserDir(owner.id);
+        } catch (IOException e) {
+            return ResponseEntity.status(500).body(JsonBuilder.buildFailOutput("Could not create user folder due to server exception"));
+        }
         try (ObjectInputStream in = new ObjectInputStream(new FileInputStream(noteFile))) {
             Note note = (Note) in.readObject();
             in.close();
             if (note.encryptionType == 1) {
-                if (password == null)
-                    return ResponseEntity.status(400).body(JsonBuilder.buildFailOutput("Note has a protection type 1, provide a password"));
-                if (!note.verifyPassword(password)) {
-                    return ResponseEntity.status(400).body(JsonBuilder.buildFailOutput("Passwords didnt match"));
-                }
+                if (password == null) return ResponseEntity.status(400).body(JsonBuilder.buildFailOutput("Note has a protection type 1, provide a password"));
+                if (!note.verifyPassword(password)) return ResponseEntity.status(400).body(JsonBuilder.buildFailOutput("Passwords didnt match"));
             }
             note.setText(body);
-            if (!encryption.equals("-1")) {
-                int encryptionType = Integer.parseInt(encryption);
-                if (encryptionType < 0) {
-                    throw new NumberFormatException("Encryption cannot be less than zero");
+            if (encryption!=null) {
+                int encryptionVal = Integer.parseInt(encryption);
+                if (encryptionVal < 0) {
+                    encryptionVal = 0;
                 }
-                note.setEncryptionType(encryptionType);
+                note.setEncryptionType(encryptionVal);
             }
             if (!updatePassword.equals("")) {
                 note.setPassword(password, updatePassword);
@@ -105,10 +120,43 @@ public class NotesController {
             } catch (IOException e) {
                 return ResponseEntity.status(500).body(JsonBuilder.buildFailOutput("Failed to write note"));
             }
+        }
+        catch (NoAuthException e) {
+            return ResponseEntity.status(400).body(JsonBuilder.buildFailOutput("Error while changing password: " + e));
         } catch (NumberFormatException e) {
             return ResponseEntity.status(400).body(JsonBuilder.buildFailOutput("Encryption must be a positive integer"));
         } catch (FileNotFoundException e) {
-            return ResponseEntity.status(404).body(JsonBuilder.buildFailOutput("Note not found"));
+            try {
+                Note note = new Note();
+                try {
+                    if(encryption==null) {
+                        encryption = "0";
+                    }
+                    int encryptionVal = Integer.parseInt(encryption);
+                    if(encryptionVal<0) {
+                        encryptionVal = 0;
+                    }
+                    note.encryptionType = encryptionVal;
+                } catch (NumberFormatException ex) {
+                    return ResponseEntity.status(400).body(JsonBuilder.buildFailOutput("Encryption must be a positive integer"));
+                }
+                if(password!=null) {
+                    note.setPassword(password);
+                }
+                if(!updatePassword.equals("")) {
+                    note.setPassword(updatePassword);
+                }
+                note.setText(body).setOwner(owner).setName(id);
+                try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(noteFile))) {
+                    out.writeObject(note);
+                    out.close();
+                    return ResponseEntity.status(200).body(JsonBuilder.buildOk());
+                } catch (IOException ex) {
+                    return ResponseEntity.status(500).body(JsonBuilder.buildFailOutput("Failed to write note"));
+                }
+            } catch (NullPointerException ex) {
+                return ResponseEntity.status(400).body(JsonBuilder.buildFailOutput(""));
+            }
         } catch (IOException e) {
             NotesApplication.cli.print("Could not read note " + id + ":", Defaults.boxedText);
             e.printStackTrace();
@@ -117,12 +165,40 @@ public class NotesController {
             NotesApplication.cli.print("Could not read note " + id + ":", Defaults.boxedText);
             return ResponseEntity.status(500).body(JsonBuilder.buildFailOutput("Note corrupted"));
         }
-        catch (NoAuthException e) {
-            return ResponseEntity.status(400).body(JsonBuilder.buildFailOutput("Error while changing password: " + e));
+    }
+
+    public static ResponseEntity<String> getNotes(@RequestHeader(name = "token") String token) {
+        Integer owner = TokenController.getUserId(token);
+        if (owner == null) {
+            return ResponseEntity.status(401).body(JsonBuilder.buildFailOutput("Token verification failed"));
+        }
+        File notesDir = new File(location + "/" + owner + "/");
+        try {
+            validateUserDir(owner);
+        } catch (IOException e) {
+            return ResponseEntity.status(500).body(JsonBuilder.buildFailOutput("Could not create user folder due to server exception"));
+        }
+        ArrayList<Note> notes = new ArrayList<>();
+        try {
+            for (File noteFile : Objects.requireNonNull(notesDir.listFiles((file, s) -> s.matches("(^.*\\.note$)")))) {
+                try (ObjectInputStream in = new ObjectInputStream(new FileInputStream(noteFile))) {
+                    Note note = (Note) in.readObject();
+                    notes.add(note);
+                } catch (IOException e) {
+                    NotesApplication.cli.print("Could not read note:");
+                    e.printStackTrace();
+                } catch (ClassNotFoundException e) {
+                    NotesApplication.cli.print("Broken note on user " + owner + ", file " + noteFile.getAbsolutePath(), Defaults.boxedText);
+                }
+            }
+            return ResponseEntity.status(200).body(JsonBuilder.buildGetNotes(notes));
+        } catch (NullPointerException impossible) { //already handled in validateUserDir
+            return ResponseEntity.status(500).body(JsonBuilder.buildFailOutput("You should not really be here"));
         }
     }
 
-    public static ResponseEntity<String> getNotes(@RequestHeader(name = "token")) {
-
+    @ExceptionHandler(MissingServletRequestParameterException.class)
+    public static ResponseEntity<String> noParameter(MissingServletRequestParameterException e) {
+        return ResponseEntity.status(400).body(JsonBuilder.buildFailOutput("One or more required parameters were not provided: " + e));
     }
 }

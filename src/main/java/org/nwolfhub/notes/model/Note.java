@@ -123,4 +123,9 @@ public class Note implements Serializable {
         }
         return this;
     }
+
+    public Note setPassword(String password) {
+        this.password = password;
+        return this;
+    }
 }

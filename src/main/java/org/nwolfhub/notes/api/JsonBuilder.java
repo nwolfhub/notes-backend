@@ -2,6 +2,8 @@ package org.nwolfhub.notes.api;
 
 import org.nwolfhub.notes.model.Note;
 
+import java.util.List;
+
 public class JsonBuilder {
     public static String buildOkLoginOutput(String token) {
         return "{\"token\": \"" + token + "\"}";
@@ -15,6 +17,23 @@ public class JsonBuilder {
     }
 
     public static String buildGetNote(String note) {
-        return "{\"note\": \"" + note.replace("\"", "\\\\\"") + "\"}";
+        return "{\"note\": \"" + note + "\"}";
+    }
+
+    public static String buildGetNotes(List<Note> notes) {
+        StringBuilder builder = new StringBuilder();
+        builder.append("\"notes\": [");
+        boolean first = true;
+        for(Note note:notes) {
+            if(!first) {
+                builder.append(",");
+            }
+            builder.append("{");
+            builder.append("\"name\": \"").append(note.getName()).append("\",");
+            builder.append("\"encryption\": ").append(note.getEncryptionType());
+            builder.append("}");
+        }
+        builder.append("]");
+        return builder.toString();
     }
 }
