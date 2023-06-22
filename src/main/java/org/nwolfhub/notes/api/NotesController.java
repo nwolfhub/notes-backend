@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+@RestController
 @RequestMapping("/api/notes")
 public class NotesController {
     private static String location;
@@ -43,8 +44,8 @@ public class NotesController {
 
     private static void validateUserDir(Integer id) throws IOException {
         File userDir = new File(location + "/" + id + "/");
-        if(!userDir.exists()) {
-            userDir.createNewFile();
+        if(!userDir.isDirectory()) {
+            userDir.mkdirs();
         }
     }
 
@@ -93,6 +94,7 @@ public class NotesController {
         try {
             validateUserDir(owner.id);
         } catch (IOException e) {
+            e.printStackTrace();
             return ResponseEntity.status(500).body(JsonBuilder.buildFailOutput("Could not create user folder due to server exception"));
         }
         try (ObjectInputStream in = new ObjectInputStream(new FileInputStream(noteFile))) {
@@ -147,15 +149,21 @@ public class NotesController {
                     note.setPassword(updatePassword);
                 }
                 note.setText(body).setOwner(owner).setName(id);
+                System.out.println(noteFile.getAbsolutePath());
+                noteFile.createNewFile();
                 try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(noteFile))) {
                     out.writeObject(note);
                     out.close();
                     return ResponseEntity.status(200).body(JsonBuilder.buildOk());
                 } catch (IOException ex) {
+                    ex.printStackTrace();
                     return ResponseEntity.status(500).body(JsonBuilder.buildFailOutput("Failed to write note"));
                 }
             } catch (NullPointerException ex) {
                 return ResponseEntity.status(400).body(JsonBuilder.buildFailOutput(""));
+            } catch (IOException ex) {
+                ex.printStackTrace();
+                return ResponseEntity.status(500).body(JsonBuilder.buildFailOutput("Failed to create note file"));
             }
         } catch (IOException e) {
             NotesApplication.cli.print("Could not read note " + id + ":", Defaults.boxedText);
@@ -167,6 +175,7 @@ public class NotesController {
         }
     }
 
+    @GetMapping("/getNotes")
     public static ResponseEntity<String> getNotes(@RequestHeader(name = "token") String token) {
         Integer owner = TokenController.getUserId(token);
         if (owner == null) {
