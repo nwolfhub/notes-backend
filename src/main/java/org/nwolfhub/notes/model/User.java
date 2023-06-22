@@ -10,7 +10,7 @@ import java.security.NoSuchAlgorithmException;
 @Table(name = "users", schema = "notes")
 public class User implements Serializable {
     @Id
-    @SequenceGenerator(name = "uidGen", sequenceName = "users.id_increaser", allocationSize = 1)
+    @SequenceGenerator(name = "uidGen", sequenceName = "notes.id_increaser", allocationSize = 1)
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "uidGen")
     public Integer id;
 
