@@ -149,7 +149,6 @@ public class NotesController {
                     note.setPassword(updatePassword);
                 }
                 note.setText(body).setOwner(owner).setName(id);
-                System.out.println(noteFile.getAbsolutePath());
                 noteFile.createNewFile();
                 try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(noteFile))) {
                     out.writeObject(note);
