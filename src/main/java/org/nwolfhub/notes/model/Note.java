@@ -113,7 +113,7 @@ public class Note implements Serializable {
         } else throw new NoAuthException("Cannot request password from encryption type less than 3");
     }
 
-    public Note setPassword(String password, String prevPassword) {
+    public Note setPassword(String prevPassword, String password) {
         if(encryptionType==0 || encryptionType>=3) {
             this.password = password;
         } else if(encryptionType==1) {
