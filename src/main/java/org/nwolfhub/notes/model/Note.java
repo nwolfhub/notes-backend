@@ -117,7 +117,7 @@ public class Note implements Serializable {
         if(encryptionType==0 || encryptionType>=3) {
             this.password = password;
         } else if(encryptionType==1) {
-            if(prevPassword.equals(password)) {
+            if(prevPassword.equals(this.password)) {
                 this.password = password;
             } else throw new NoAuthException("Previous password didn't match");
         }
