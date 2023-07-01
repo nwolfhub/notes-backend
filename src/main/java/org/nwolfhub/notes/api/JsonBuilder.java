@@ -1,6 +1,7 @@
 package org.nwolfhub.notes.api;
 
 import org.nwolfhub.notes.model.Note;
+import org.nwolfhub.notes.model.User;
 
 import java.util.List;
 
@@ -14,6 +15,10 @@ public class JsonBuilder {
 
     public static String buildOk() {
         return "{\"ok\": 1\"}";
+    }
+
+    public static String buildGetMe(User u) {
+        return "{\"user\": \"" + u.username + "\", \"id\": " + u.id + "}";
     }
 
     public static String buildGetNote(String note) {

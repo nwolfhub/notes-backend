@@ -5,6 +5,7 @@ import org.nwolfhub.notes.database.UserDao;
 import org.nwolfhub.notes.model.User;
 import org.nwolfhub.utils.Utils;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.NoSuchAlgorithmException;
@@ -118,7 +119,29 @@ public class UserController {
         return ResponseEntity.status(501).body(JsonBuilder.buildFailOutput("Method not implemented yet"));
     }
 
+    @GetMapping("/getMe")
+    public static ResponseEntity<String> getMe(@RequestHeader(name = "token") String token) {
+        User user = TokenController.getUser(token);
+        if(user!=null) {
+            return ResponseEntity.status(200).body(JsonBuilder.buildGetMe(user));
+        } else {
+            return ResponseEntity.status(401).body(JsonBuilder.buildFailOutput("Token verification failed"));
+        }
+    }
 
+    @GetMapping("/checkAuth")
+    public static ResponseEntity<String> checkAuth(@RequestHeader(name="token") String token) {
+        if(TokenController.getUserId(token)!=null) {
+            return ResponseEntity.status(200).body(JsonBuilder.buildOk());
+        } else {
+            return ResponseEntity.status(401).body(JsonBuilder.buildFailOutput("Token verification failed"));
+        }
+    }
+
+    @ExceptionHandler(MissingServletRequestParameterException.class)
+    public static ResponseEntity<String> noParameter(MissingServletRequestParameterException e) {
+        return ResponseEntity.status(400).body(JsonBuilder.buildFailOutput("One or more required parameters were not provided: " + e));
+    }
 
 
     //inner methods
