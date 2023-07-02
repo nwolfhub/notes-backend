@@ -53,7 +53,7 @@ public class NotesController {
         validateDir();
     }
 
-    @GetMapping("/getNote")
+    @GetMapping("/get")
     public static ResponseEntity<String> getNote(@RequestParam(name = "name") String id, @RequestHeader(name = "password", required = false, defaultValue = "") String password, @RequestHeader(name = "token") String token) {
         Integer owner = TokenController.getUserId(token);
         if(owner==null) {
@@ -84,7 +84,7 @@ public class NotesController {
         }
     }
 
-    @PostMapping("/setNote")
+    @PostMapping("/set")
     public static ResponseEntity<String> setNote(@RequestParam(name = "name") String id, @RequestHeader(name = "password", required = false) String password, @RequestBody() String body, @RequestParam(name = "encryption", required = false) String encryption, @RequestHeader(name = "updatePassword", defaultValue = "", required = false) String updatePassword, @RequestHeader(name = "token") String token) {
         User owner = TokenController.getUser(token);
         if (owner == null) {
@@ -174,7 +174,7 @@ public class NotesController {
         }
     }
 
-    @GetMapping("/getNotes")
+    @GetMapping("/getAll")
     public static ResponseEntity<String> getNotes(@RequestHeader(name = "token") String token) {
         Integer owner = TokenController.getUserId(token);
         if (owner == null) {
@@ -202,6 +202,30 @@ public class NotesController {
             return ResponseEntity.status(200).body(JsonBuilder.buildGetNotes(notes));
         } catch (NullPointerException impossible) { //already handled in validateUserDir
             return ResponseEntity.status(500).body(JsonBuilder.buildFailOutput("You should not really be here"));
+        }
+    }
+
+    @GetMapping("/delete")
+    public static ResponseEntity<String> deleteNote(@RequestHeader(name = "token") String token, @RequestParam(name = "note") String name) {
+        Integer owner = TokenController.getUserId(token);
+        if (owner == null) {
+            return ResponseEntity.status(401).body(JsonBuilder.buildFailOutput("Token verification failed"));
+        }
+        try {
+            validateUserDir(owner);
+        } catch (IOException e) {
+            return ResponseEntity.status(500).body(JsonBuilder.buildFailOutput("Could not create user folder due to server exception"));
+        }
+        File noteFile = new File(location + "/" + owner + "/" + name + ".note");
+        if(noteFile.exists()) {
+            boolean res = noteFile.delete();
+            if(res) {
+                return ResponseEntity.status(200).body(JsonBuilder.buildOk());
+            } else {
+                return ResponseEntity.status(500).body(JsonBuilder.buildFailOutput("Failed to delete note due to server error"));
+            }
+        } else {
+            return ResponseEntity.status(400).body(JsonBuilder.buildFailOutput("Note did not exist"));
         }
     }
 
