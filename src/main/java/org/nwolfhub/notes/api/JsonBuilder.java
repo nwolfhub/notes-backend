@@ -27,7 +27,7 @@ public class JsonBuilder {
 
     public static String buildGetNotes(List<Note> notes) {
         StringBuilder builder = new StringBuilder();
-        builder.append("\"notes\": [");
+        builder.append("{\"notes\": [");
         boolean first = true;
         for(Note note:notes) {
             if(!first) {
@@ -38,7 +38,7 @@ public class JsonBuilder {
             builder.append("\"encryption\": ").append(note.getEncryptionType());
             builder.append("}");
         }
-        builder.append("]");
+        builder.append("]}");
         return builder.toString();
     }
 }
