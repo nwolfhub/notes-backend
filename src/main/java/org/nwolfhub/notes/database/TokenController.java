@@ -15,7 +15,7 @@ public class TokenController {
     private static RedisController controller;
     private static HashMap<String, Integer> tokenToUser;
     private static Long lastCleanup;
-    private static Integer cleanupRate;
+    private static Integer cleanupRate = 24;
 
     public static void init() {
         String useRedis = Configurator.getEntry("use_redis");
@@ -34,6 +34,12 @@ public class TokenController {
             controller = new RedisController(jedis);
         } else {
             tokenToUser = new HashMap<>();
+            String rate = Configurator.getEntry("cleanup_rate");
+            if(rate==null) {
+                cleanupRate = 24;
+            } else {
+                cleanupRate = Integer.valueOf(rate);
+            }
         }
         new Thread(TokenController::cleanUp).start();
     }
