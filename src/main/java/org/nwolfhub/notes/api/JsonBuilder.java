@@ -37,6 +37,7 @@ public class JsonBuilder {
             builder.append("\"name\": \"").append(note.getName()).append("\",");
             builder.append("\"encryption\": ").append(note.getEncryptionType());
             builder.append("}");
+            first=false;
         }
         builder.append("]}");
         return builder.toString();
