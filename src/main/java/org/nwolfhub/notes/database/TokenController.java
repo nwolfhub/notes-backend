@@ -31,7 +31,7 @@ public class TokenController {
             } else {
                 cleanupRate = Integer.valueOf(rate);
             }
-            controller = new RedisController(jedis);
+            controller = new RedisController(Configurator.getEntry("redis_url"), Integer.parseInt(Configurator.getEntry("redis_port")), Configurator.getEntry("redis_user"), Configurator.getEntry("redis_password"));
         } else {
             tokenToUser = new HashMap<>();
             String rate = Configurator.getEntry("cleanup_rate");
