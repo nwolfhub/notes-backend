@@ -1,8 +1,10 @@
 package org.nwolfhub.notes.database;
 
 import org.nwolfhub.notes.Configurator;
+import org.nwolfhub.notes.NotesApplication;
 import org.nwolfhub.notes.api.UserController;
 import org.nwolfhub.notes.model.User;
+import org.nwolfhub.utils.Main;
 import org.nwolfhub.utils.Utils;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.args.FlushMode;
@@ -81,7 +83,9 @@ public class TokenController {
             if(date.getTime() - cleanupRate*3600000>=lastCleanup) {
                 if(controller!=null) {
                     controller.cleanup();
+                    NotesApplication.cli.print("Performing redis cleanup at " + date.getTime());
                 } else {
+                    NotesApplication.cli.print("Performing hashmap cleanup at " + date.getTime());
                     tokenToUser.clear();
                 }
                 lastCleanup = date.getTime();
