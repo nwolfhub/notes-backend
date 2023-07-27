@@ -8,7 +8,10 @@ import org.nwolfhub.notes.database.TokenController;
 import org.nwolfhub.notes.model.NoAuthException;
 import org.nwolfhub.notes.model.Note;
 import org.nwolfhub.notes.model.User;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Component;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,10 +20,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+@Component
 @RestController
 @RequestMapping("/api/notes")
 public class NotesController {
     private static String location;
+    @Autowired
+    private static org.nwolfhub.utils.Configurator donationConfigurator;
+    public static Boolean used;
 
     private static void validateDir() {
         if(location==null) {

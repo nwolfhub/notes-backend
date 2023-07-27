@@ -1,9 +1,11 @@
 package org.nwolfhub.notes;
 
+import org.nwolfhub.notes.api.NotesController;
 import org.nwolfhub.notes.database.HibernateController;
 import org.nwolfhub.notes.database.UserDao;
 import org.nwolfhub.utils.Utils;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 
@@ -14,6 +16,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Properties;
 
 @Configuration
+@ComponentScan(basePackages = "org.nwolfhub.utils.Configurator")
 public class Configurator {
     private static final org.nwolfhub.utils.Configurator configurator = new org.nwolfhub.utils.Configurator(new File("notes.cfg"), getDemoCfg());
     public static String getDemoCfg() {
@@ -66,5 +69,18 @@ public class Configurator {
 
     public static String getEntry(String key) {
         return configurator.getValue(key);
+    }
+
+    @Bean(name = "privilegesConfigurator")
+    @Primary
+    public static org.nwolfhub.utils.Configurator privilegesConfigurator() {
+        org.nwolfhub.utils.Configurator privilegeConfig = new org.nwolfhub.utils.Configurator(new File("privileges.cfg"), """
+        active=false
+        host=http://your-donation-server.com
+        privilege_default=10
+        privilege_premium=40
+        """);
+        NotesController.used=Boolean.parseBoolean(privilegeConfig.getValue("used"));
+        return privilegeConfig;
     }
 }
