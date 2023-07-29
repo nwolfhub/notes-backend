@@ -22,7 +22,7 @@ public class JsonBuilder {
     }
 
     public static String buildGetNote(String note) {
-        return "{\"note\": \"" + note + "\"}";
+        return "{\"note\": \"" + note.replace("\"", "\\\"") + "\"}";
     }
 
     public static String buildGetNotes(List<Note> notes) {
