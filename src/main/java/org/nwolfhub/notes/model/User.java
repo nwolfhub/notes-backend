@@ -36,6 +36,7 @@ public class User implements Serializable {
         this.salt2 = Utils.generateString(20);
         this.password = Utils.hashString(salt1 + password + salt2);
         this.isBanned = false;
+        this.privilege = "default";
     }
 
     public Integer getId() {
