@@ -67,6 +67,12 @@ public class TokenController {
         }
     }
 
+    public static void revokeToken(String token) {
+        if(controller!=null) {
+
+        }
+    }
+
     public static String generateToken(Integer user) {
         String token = Utils.generateString(130);
         if(controller==null) {
@@ -83,9 +89,7 @@ public class TokenController {
             if(date.getTime() - cleanupRate*3600000>=lastCleanup) {
                 if(controller!=null) {
                     controller.cleanup();
-                    NotesApplication.cli.print("Performing redis cleanup at " + date.getTime());
                 } else {
-                    NotesApplication.cli.print("Performing hashmap cleanup at " + date.getTime());
                     tokenToUser.clear();
                 }
                 lastCleanup = date.getTime();

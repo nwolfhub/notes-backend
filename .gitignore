@@ -32,6 +32,7 @@ target/
 
 ### VS Code ###
 .vscode/
-notes.cfg
 
+notes.cfg
+privileges.cfg
 docker/

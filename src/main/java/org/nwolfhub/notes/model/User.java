@@ -121,4 +121,13 @@ public class User implements Serializable {
         this.email = email;
         return this;
     }
+
+    public String getPrivilege() {
+        return privilege;
+    }
+
+    public User setPrivilege(String privilege) {
+        this.privilege = privilege;
+        return this;
+    }
 }
