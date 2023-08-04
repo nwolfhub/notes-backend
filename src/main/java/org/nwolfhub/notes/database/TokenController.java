@@ -78,8 +78,8 @@ public class TokenController {
     }
 
     private static void cleanUp() {
-        Date date = new Date();
         while (true) {
+            Date date = new Date();
             if(date.getTime() - cleanupRate*3600000>=lastCleanup) {
                 if(controller!=null) {
                     controller.cleanup();
