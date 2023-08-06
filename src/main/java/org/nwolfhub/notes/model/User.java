@@ -21,7 +21,7 @@ public class User implements Serializable {
     public String password;
     public String email;
 
-    public String privilege;
+    public String privilege = "default";
 
     public boolean isBanned;
 
