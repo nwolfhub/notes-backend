@@ -21,6 +21,8 @@ public class User implements Serializable {
     public String password;
     public String email;
 
+    public String privilege = "default";
+
     public boolean isBanned;
 
     public User() {
@@ -34,6 +36,7 @@ public class User implements Serializable {
         this.salt2 = Utils.generateString(20);
         this.password = Utils.hashString(salt1 + password + salt2);
         this.isBanned = false;
+        this.privilege = "default";
     }
 
     public Integer getId() {
@@ -117,6 +120,15 @@ public class User implements Serializable {
 
     public User setEmail(String email) {
         this.email = email;
+        return this;
+    }
+
+    public String getPrivilege() {
+        return privilege;
+    }
+
+    public User setPrivilege(String privilege) {
+        this.privilege = privilege;
         return this;
     }
 }

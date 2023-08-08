@@ -5,10 +5,14 @@ import org.nwolfhub.easycli.Main;
 import org.nwolfhub.notes.Configurator;
 import org.nwolfhub.notes.NotesApplication;
 import org.nwolfhub.notes.database.TokenController;
+import org.nwolfhub.notes.database.UserDao;
 import org.nwolfhub.notes.model.NoAuthException;
 import org.nwolfhub.notes.model.Note;
 import org.nwolfhub.notes.model.User;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Component;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,10 +21,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+@Component
 @RestController
 @RequestMapping("/api/notes")
 public class NotesController {
     private static String location;
+
+    private static org.nwolfhub.utils.Configurator donationConfigurator;
+    public static Boolean used;
 
     private static void validateDir() {
         if(location==null) {
@@ -49,8 +57,10 @@ public class NotesController {
         }
     }
 
-    public static void init() {
+    public static void init(org.nwolfhub.utils.Configurator configurator, UserDao dao) {
         validateDir();
+        donationConfigurator = configurator;
+        PaymentController.init(configurator, dao);
     }
 
     @GetMapping("/get")
@@ -84,11 +94,52 @@ public class NotesController {
         }
     }
 
+    @GetMapping("/create")
+    public static ResponseEntity<String> createNote(@RequestParam(name = "name") String id, @RequestHeader(name = "token") String token) {
+        User owner = TokenController.getUser(token);
+        if (owner == null) {
+            return ResponseEntity.status(401).body(JsonBuilder.buildFailOutput("Token verification failed"));
+        }
+        if (owner.isBanned()) {
+            return ResponseEntity.status(401).body(JsonBuilder.buildFailOutput("User is banned"));
+        }
+        try {
+            validateUserDir(owner.getId());
+        } catch (IOException e) {
+            e.printStackTrace();
+            return ResponseEntity.status(500).body(JsonBuilder.buildFailOutput("Could not create user folder due to server exception"));
+        }
+        File noteFile = new File(location + "/" + owner.id + "/" + id + ".note");
+        if (noteFile.exists()) {
+            return ResponseEntity.status(400).body(JsonBuilder.buildFailOutput("Note already exists"));
+        }
+        File notesDir = new File(location + "/" + owner.id + "/");
+        try {
+            Integer filesAmount = Objects.requireNonNull(notesDir.listFiles()).length;
+            Integer maxAllowedAmount = Integer.valueOf(donationConfigurator.getValue("privilege_" + owner.getPrivilege()));
+            if(filesAmount<=maxAllowedAmount) {
+                noteFile.createNewFile();
+                try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(noteFile))) {
+                    out.writeObject(new Note(owner, "").setName(id));
+                }
+                return ResponseEntity.status(200).body(JsonBuilder.buildOk());
+            }
+            return ResponseEntity.status(400).body(JsonBuilder.buildFailOutput("Reached notes limit"));
+        } catch (NumberFormatException | NullPointerException e) {
+            return ResponseEntity.status(500).body(JsonBuilder.buildFailOutput("The servers privileges configuration seems wrong. Please contact your server administrator"));
+        } catch (IOException e) {
+            return ResponseEntity.status(500).body(JsonBuilder.buildFailOutput("Failed to create note file"));
+        }
+    }
+
     @PostMapping("/set")
     public static ResponseEntity<String> setNote(@RequestParam(name = "name") String id, @RequestHeader(name = "password", required = false) String password, @RequestBody() String body, @RequestParam(name = "encryption", required = false) String encryption, @RequestHeader(name = "updatePassword", defaultValue = "", required = false) String updatePassword, @RequestHeader(name = "token") String token) {
         User owner = TokenController.getUser(token);
         if (owner == null) {
             return ResponseEntity.status(401).body(JsonBuilder.buildFailOutput("Token verification failed"));
+        }
+        if (owner.isBanned()) {
+            return ResponseEntity.status(401).body(JsonBuilder.buildFailOutput("User is banned"));
         }
         File noteFile = new File(location + "/" + owner.id + "/" + id + ".note");
         try {
@@ -129,37 +180,44 @@ public class NotesController {
             return ResponseEntity.status(400).body(JsonBuilder.buildFailOutput("Encryption must be a positive integer"));
         } catch (FileNotFoundException e) {
             try {
-                Note note = new Note();
-                try {
-                    if(encryption==null) {
-                        encryption = "0";
+                File notesDir = new File(location + "/" + owner.id + "/");
+                Integer filesAmount = Objects.requireNonNull(notesDir.listFiles()).length;
+                Integer maxAllowedAmount = Integer.valueOf(donationConfigurator.getValue("privilege_" + owner.getPrivilege()));
+                if(maxAllowedAmount>=filesAmount) {
+                    Note note = new Note();
+                    try {
+                        if (encryption == null) {
+                            encryption = "0";
+                        }
+                        int encryptionVal = Integer.parseInt(encryption);
+                        if (encryptionVal < 0) {
+                            encryptionVal = 0;
+                        }
+                        note.encryptionType = encryptionVal;
+                    } catch (NumberFormatException ex) {
+                        return ResponseEntity.status(400).body(JsonBuilder.buildFailOutput("Encryption must be a positive integer"));
                     }
-                    int encryptionVal = Integer.parseInt(encryption);
-                    if(encryptionVal<0) {
-                        encryptionVal = 0;
+                    if (password != null) {
+                        note.setPassword(password);
                     }
-                    note.encryptionType = encryptionVal;
-                } catch (NumberFormatException ex) {
-                    return ResponseEntity.status(400).body(JsonBuilder.buildFailOutput("Encryption must be a positive integer"));
+                    if (!updatePassword.equals("")) {
+                        note.setPassword(updatePassword);
+                    }
+                    note.setText(body).setOwner(owner).setName(id);
+                    noteFile.createNewFile();
+                    try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(noteFile))) {
+                        out.writeObject(note);
+                        out.close();
+                        return ResponseEntity.status(200).body(JsonBuilder.buildOk());
+                    } catch (IOException ex) {
+                        ex.printStackTrace();
+                        return ResponseEntity.status(500).body(JsonBuilder.buildFailOutput("Failed to write note"));
+                    }
+                } else {
+                    return ResponseEntity.status(400).body(JsonBuilder.buildFailOutput("Reached notes limit"));
                 }
-                if(password!=null) {
-                    note.setPassword(password);
-                }
-                if(!updatePassword.equals("")) {
-                    note.setPassword(updatePassword);
-                }
-                note.setText(body).setOwner(owner).setName(id);
-                noteFile.createNewFile();
-                try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(noteFile))) {
-                    out.writeObject(note);
-                    out.close();
-                    return ResponseEntity.status(200).body(JsonBuilder.buildOk());
-                } catch (IOException ex) {
-                    ex.printStackTrace();
-                    return ResponseEntity.status(500).body(JsonBuilder.buildFailOutput("Failed to write note"));
-                }
-            } catch (NullPointerException ex) {
-                return ResponseEntity.status(400).body(JsonBuilder.buildFailOutput(""));
+            } catch (NumberFormatException | NullPointerException ex) {
+                return ResponseEntity.status(500).body(JsonBuilder.buildFailOutput("The servers privileges configuration seems wrong. Please contact your server administrator"));
             } catch (IOException ex) {
                 ex.printStackTrace();
                 return ResponseEntity.status(500).body(JsonBuilder.buildFailOutput("Failed to create note file"));

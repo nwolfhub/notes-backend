@@ -47,7 +47,6 @@ public class UserController {
                 } else {
                     return ResponseEntity.status(401).body(JsonBuilder.buildFailOutput("User is banned"));
                 }
-
             }
             return ResponseEntity.status(401).body(JsonBuilder.buildFailOutput("Passwords didnt match"));
         } else {
@@ -88,7 +87,7 @@ public class UserController {
     }
 
 
-    @PostMapping("/changepassword")
+    @PostMapping("/changePassword")
     public static ResponseEntity<String> changePassword(@RequestBody String body) {
         HashMap<String, String> bodyValues = Utils.parseValues(body, "\n");
         String username = bodyValues.get("username");
@@ -114,7 +113,7 @@ public class UserController {
         }
     }
 
-    @PostMapping("/updateuser")
+    @PostMapping("/updateUser")
     public static ResponseEntity<String> updateUser() {
         return ResponseEntity.status(501).body(JsonBuilder.buildFailOutput("Method not implemented yet"));
     }

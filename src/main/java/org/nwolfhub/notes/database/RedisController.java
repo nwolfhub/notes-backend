@@ -36,6 +36,12 @@ public class RedisController {
         }
     }
 
+    public void delete(String key) {
+        try (Jedis jedis = obtainInstance()) {
+            jedis.del(key);
+        }
+    }
+
     private JedisPoolConfig buildPoolConfig() {
         final JedisPoolConfig poolConfig = new JedisPoolConfig();
         poolConfig.setMaxTotal(128);
