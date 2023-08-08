@@ -24,7 +24,7 @@ public class NotesApplication {
 		cli.addTemplate(Defaults.defaultTemplate);
 		SpringApplication.run(NotesApplication.class, args);
 		AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(Configurator.class);
-		NotesController.init();
+		NotesController.init((org.nwolfhub.utils.Configurator) context.getBean("privilegesConfigurator"), context.getBean(UserDao.class));
 		TokenController.init();
 		UserController.init(context.getBean(UserDao.class));
 	}

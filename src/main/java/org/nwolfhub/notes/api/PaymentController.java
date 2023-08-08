@@ -9,12 +9,19 @@ import okhttp3.Request;
 import okhttp3.Response;
 import org.hibernate.sql.Update;
 import org.nwolfhub.notes.NotesApplication;
+import org.nwolfhub.notes.database.TokenController;
 import org.nwolfhub.notes.database.UserDao;
 import org.nwolfhub.notes.model.User;
 import org.nwolfhub.utils.Configurator;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.util.List;
+import java.util.stream.Collectors;
 
+@RestController
+@RequestMapping("/api/limits")
 public class PaymentController {
     private static Configurator configurator;
     private static UserDao dao;
@@ -25,6 +32,29 @@ public class PaymentController {
         if(active.equals("true")) {
             new Thread(PaymentController::startListening).start();
         }
+    }
+
+    @GetMapping("/getPrivileges")
+    public static ResponseEntity<String> getPrivileges(@RequestHeader(name = "token") String token) {
+        if(!configurator.getValue("active").equals("true")) return ResponseEntity.status(400).body(JsonBuilder.buildFailOutput("Payments are disabled on this server"));
+        Integer userId = TokenController.getUserId(token);
+        if(userId==null) {
+            return ResponseEntity.status(401).body(JsonBuilder.buildFailOutput("Token verification failed"));
+        }
+        List<String> privileges = configurator.getAllKeys("privilege_*");
+        privileges = privileges.stream().map(e -> {
+            e = e.replace("privilege_", "");
+            return e;
+        }).collect(Collectors.toList());
+        return ResponseEntity.status(200).body(JsonBuilder.buildPrivilegesList(privileges));
+    }
+
+    @GetMapping("/buyPrivilege")
+    public static ResponseEntity<String> buyPrivilege(@RequestHeader(name = "token") String token) {
+        if(!configurator.getValue("active").equals("true")) return ResponseEntity.status(400).body(JsonBuilder.buildFailOutput("Payments are disabled on this server"));
+        User user = TokenController.getUser(token);
+        if(user==null) return ResponseEntity.status(401).body(JsonBuilder.buildFailOutput("Token verification failed"));
+        return ResponseEntity.status(200).body(JsonBuilder.buildDonationServerUrlResponse(configurator.getValue("host") + "/public/buy?user=" + user.getId()));
     }
 
     private static void startListening() {

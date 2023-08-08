@@ -42,4 +42,17 @@ public class JsonBuilder {
         builder.append("]}");
         return builder.toString();
     }
+
+    public static String buildPrivilegesList(List<String> privileges) {
+        StringBuilder builder = new StringBuilder("{\"privileges\": [");
+        for(String privilege:privileges) {
+            builder.append("\"").append(privilege).append("\"");
+        }
+        builder.append("]}");
+        return builder.toString();
+    }
+
+    public static String buildDonationServerUrlResponse(String server) {
+        return ("{\"url\": \"" + server + "\"}");
+    }
 }

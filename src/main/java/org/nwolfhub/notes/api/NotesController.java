@@ -5,6 +5,7 @@ import org.nwolfhub.easycli.Main;
 import org.nwolfhub.notes.Configurator;
 import org.nwolfhub.notes.NotesApplication;
 import org.nwolfhub.notes.database.TokenController;
+import org.nwolfhub.notes.database.UserDao;
 import org.nwolfhub.notes.model.NoAuthException;
 import org.nwolfhub.notes.model.Note;
 import org.nwolfhub.notes.model.User;
@@ -25,7 +26,7 @@ import java.util.Objects;
 @RequestMapping("/api/notes")
 public class NotesController {
     private static String location;
-    @Autowired
+
     private static org.nwolfhub.utils.Configurator donationConfigurator;
     public static Boolean used;
 
@@ -56,8 +57,10 @@ public class NotesController {
         }
     }
 
-    public static void init() {
+    public static void init(org.nwolfhub.utils.Configurator configurator, UserDao dao) {
         validateDir();
+        donationConfigurator = configurator;
+        PaymentController.init(configurator, dao);
     }
 
     @GetMapping("/get")
