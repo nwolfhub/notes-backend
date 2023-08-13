@@ -4,12 +4,14 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Transient;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 /**
  * Basic note class. Contains a user and a notes text
  */
 public class Note implements Serializable {
+    private static final long serialVersionUID = 2807257344388179956L;
     public String name;
     public User owner;
     private String text;
