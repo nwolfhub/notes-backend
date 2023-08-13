@@ -24,7 +24,9 @@ public class UserDao {
         Session session = controller.getSessionFactory().openSession();
         Query query = session.createQuery("from User where username=:username")
                 .setParameter("username", username);
-        return (User) query.uniqueResult();
+        User toReturn = (User) query.uniqueResult();
+        session.close();
+        return toReturn;
     }
     public void setObject(Object o) {
         Session session = controller.getSessionFactory().openSession();
