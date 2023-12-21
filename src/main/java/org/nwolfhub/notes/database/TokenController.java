@@ -1,17 +1,14 @@
 package org.nwolfhub.notes.database;
 
 import org.nwolfhub.notes.Configurator;
-import org.nwolfhub.notes.NotesApplication;
-import org.nwolfhub.notes.api.UserController;
+import org.nwolfhub.notes.api.legacy.UserController;
 import org.nwolfhub.notes.model.User;
-import org.nwolfhub.utils.Main;
 import org.nwolfhub.utils.Utils;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.args.FlushMode;
 
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Set;
 
 public class TokenController {
     private static RedisController controller;

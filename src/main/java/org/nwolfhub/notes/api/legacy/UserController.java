@@ -1,4 +1,4 @@
-package org.nwolfhub.notes.api;
+package org.nwolfhub.notes.api.legacy;
 
 import org.nwolfhub.notes.database.TokenController;
 import org.nwolfhub.notes.database.UserDao;

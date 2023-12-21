@@ -1,6 +1,6 @@
 package org.nwolfhub.notes;
 
-import org.nwolfhub.notes.api.NotesController;
+import org.nwolfhub.notes.api.legacy.NotesController;
 import org.nwolfhub.notes.database.HibernateController;
 import org.nwolfhub.notes.database.UserDao;
 import org.nwolfhub.utils.Utils;
@@ -8,15 +8,21 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
+import org.springframework.core.annotation.Order;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.core.session.SessionRegistryImpl;
+import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.session.RegisterSessionAuthenticationStrategy;
+import org.springframework.security.web.authentication.session.SessionAuthenticationStrategy;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.util.Properties;
 
 @Configuration
 @ComponentScan(basePackages = "org.nwolfhub.utils.Configurator")
+@EnableWebSecurity
 public class Configurator {
     private static final org.nwolfhub.utils.Configurator configurator = new org.nwolfhub.utils.Configurator(new File("notes.cfg"), getDemoCfg());
     public static String getDemoCfg() {
@@ -53,7 +59,7 @@ public class Configurator {
         prop.put("hibernate.connection.useUnicode", true);
         prop.put("hibernate.connection.pool_size", 100);
         return prop;
-    }
+    })
 
     @Bean(name = "hibernateController")
     @Primary
@@ -82,5 +88,21 @@ public class Configurator {
         """);
         NotesController.used=Boolean.parseBoolean(privilegeConfig.getValue("used"));
         return privilegeConfig;
+    }
+
+    @Bean
+    protected SessionAuthenticationStrategy sessionAuthenticationStrategy() {
+        return new RegisterSessionAuthenticationStrategy(new SessionRegistryImpl());
+    }
+
+    @Order(1)
+    @Bean
+    public SecurityFilterChain clientFilterChain(HttpSecurity httpSecurity) throws Exception {
+        httpSecurity.authorizeHttpRequests(authz -> authz
+                .requestMatchers(new AntPathRequestMatcher("/"))
+                .permitAll()
+                .anyRequest()
+                .authenticated());
+
     }
 }

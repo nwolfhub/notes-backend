@@ -1,7 +1,6 @@
-package org.nwolfhub.notes.api;
+package org.nwolfhub.notes.api.legacy;
 
 import org.nwolfhub.easycli.Defaults;
-import org.nwolfhub.easycli.Main;
 import org.nwolfhub.notes.Configurator;
 import org.nwolfhub.notes.NotesApplication;
 import org.nwolfhub.notes.database.TokenController;
@@ -9,8 +8,6 @@ import org.nwolfhub.notes.database.UserDao;
 import org.nwolfhub.notes.model.NoAuthException;
 import org.nwolfhub.notes.model.Note;
 import org.nwolfhub.notes.model.User;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.MissingServletRequestParameterException;
@@ -18,7 +15,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.io.*;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 
 @Component

@@ -1,4 +1,4 @@
-package org.nwolfhub.notes.api;
+package org.nwolfhub.notes.api.legacy;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -7,7 +7,6 @@ import com.google.gson.JsonParser;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
-import org.hibernate.sql.Update;
 import org.nwolfhub.notes.NotesApplication;
 import org.nwolfhub.notes.database.TokenController;
 import org.nwolfhub.notes.database.UserDao;
@@ -16,7 +15,6 @@ import org.nwolfhub.utils.Configurator;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 

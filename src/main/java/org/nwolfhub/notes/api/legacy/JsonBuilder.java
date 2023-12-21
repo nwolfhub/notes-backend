@@ -1,4 +1,4 @@
-package org.nwolfhub.notes.api;
+package org.nwolfhub.notes.api.legacy;
 
 import org.nwolfhub.notes.model.Note;
 import org.nwolfhub.notes.model.User;
