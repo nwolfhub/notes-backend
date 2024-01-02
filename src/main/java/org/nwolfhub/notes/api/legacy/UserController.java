@@ -1,8 +1,8 @@
 package org.nwolfhub.notes.api.legacy;
 
-import org.nwolfhub.notes.database.TokenController;
-import org.nwolfhub.notes.database.UserDao;
-import org.nwolfhub.notes.model.User;
+import org.nwolfhub.notes.database.legacy.TokenController;
+import org.nwolfhub.notes.database.legacy.UserDao;
+import org.nwolfhub.notes.database.legacy.model.User;
 import org.nwolfhub.utils.Utils;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MissingServletRequestParameterException;

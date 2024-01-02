@@ -1,7 +1,7 @@
 package org.nwolfhub.notes.api.legacy;
 
-import org.nwolfhub.notes.model.Note;
-import org.nwolfhub.notes.model.User;
+import org.nwolfhub.notes.database.legacy.model.Note;
+import org.nwolfhub.notes.database.legacy.model.User;
 
 import java.util.List;
 

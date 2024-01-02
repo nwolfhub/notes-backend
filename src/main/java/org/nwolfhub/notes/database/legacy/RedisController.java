@@ -1,4 +1,4 @@
-package org.nwolfhub.notes.database;
+package org.nwolfhub.notes.database.legacy;
 
 import org.springframework.stereotype.Component;
 import redis.clients.jedis.Jedis;

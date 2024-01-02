@@ -1,8 +1,8 @@
-package org.nwolfhub.notes.database;
+package org.nwolfhub.notes.database.legacy;
 
 import org.nwolfhub.notes.Configurator;
 import org.nwolfhub.notes.api.legacy.UserController;
-import org.nwolfhub.notes.model.User;
+import org.nwolfhub.notes.database.legacy.model.User;
 import org.nwolfhub.utils.Utils;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.args.FlushMode;

@@ -1,4 +1,4 @@
-package org.nwolfhub.notes.model;
+package org.nwolfhub.notes.database.legacy.model;
 
 public class NoAuthException extends RuntimeException {
     public NoAuthException() {

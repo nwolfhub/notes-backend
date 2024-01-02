@@ -1,4 +1,4 @@
-package org.nwolfhub.notes.model;
+package org.nwolfhub.notes.database.legacy.model;
 
 import jakarta.persistence.*;
 import org.nwolfhub.utils.Utils;

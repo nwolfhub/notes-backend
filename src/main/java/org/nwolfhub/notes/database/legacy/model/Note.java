@@ -1,10 +1,5 @@
-package org.nwolfhub.notes.model;
+package org.nwolfhub.notes.database.legacy.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Transient;
-
-import java.io.Serial;
 import java.io.Serializable;
 
 /**

@@ -1,9 +1,9 @@
-package org.nwolfhub.notes.database;
+package org.nwolfhub.notes.database.legacy;
 
 import org.hibernate.SessionFactory;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.cfg.Configuration;
-import org.nwolfhub.notes.model.User;
+import org.nwolfhub.notes.database.legacy.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import java.util.Properties;

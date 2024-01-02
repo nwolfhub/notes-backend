@@ -1,9 +1,9 @@
-package org.nwolfhub.notes.database;
+package org.nwolfhub.notes.database.legacy;
 
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.query.Query;
-import org.nwolfhub.notes.model.User;
+import org.nwolfhub.notes.database.legacy.model.User;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 import java.util.List;
