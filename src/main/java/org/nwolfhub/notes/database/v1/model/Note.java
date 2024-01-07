@@ -1,4 +1,4 @@
-package org.nwolfhub.notes.database.legacy.model;
+package org.nwolfhub.notes.database.v1.model;
 
 import java.io.Serializable;
 
