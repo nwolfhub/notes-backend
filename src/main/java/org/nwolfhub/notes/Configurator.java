@@ -1,10 +1,9 @@
 package org.nwolfhub.notes;
-import org.nwolfhub.notes.auth.v1.UserDetailsProvider;
+
 import org.nwolfhub.utils.Utils;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Primary;
 import org.springframework.dao.annotation.PersistenceExceptionTranslationPostProcessor;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
@@ -17,7 +16,8 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.annotation.web.configurers.LogoutConfigurer;
 import org.springframework.security.config.annotation.web.configurers.SessionManagementConfigurer;
-import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.oauth2.server.resource.web.BearerTokenAuthenticationEntryPoint;
+import org.springframework.security.oauth2.server.resource.web.access.BearerTokenAccessDeniedHandler;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.transaction.PlatformTransactionManager;
 
@@ -29,8 +29,25 @@ import java.util.Properties;
 @EnableWebSecurity
 @EnableJpaRepositories
 public class Configurator {
-    @Autowired
-    UserDetailsProvider provider;
+
+    @Value("${spring.security.oauth2.resourceserver.jwt.jwk-set-uri}")
+    String jwkSetUri;
+    @Value("${spring.security.oauth2.resourceserver.jwt.issuer-uri}")
+    String issuer;
+    @Value("${spring.security.oauth2.resourceserver.jwt.client}")
+    String client;
+    @Value("${spring.security.oauth2.resourceserver.jwt.clientsecret}")
+    String clientSecret;
+    @Value("${database.host}")
+    String dbUrl;
+    @Value("${database.port}")
+    Integer dbPort;
+    @Value("${database.name}")
+    String dbName;
+    @Value("${database.credentials.username}")
+    String dbUsername;
+    @Value("${database.credentials.password}")
+    String dbPassword;
 
     @Bean
     public LocalContainerEntityManagerFactoryBean entityManagerFactory() {
@@ -45,29 +62,17 @@ public class Configurator {
         return em;
     }
 
-    //todo: migrate configurator to spring application.properties
     @Bean
     public DataSource dataSource(){
         DriverManagerDataSource dataSource = new DriverManagerDataSource();
         dataSource.setDriverClassName("org.postgresql.Driver");
-        dataSource.setUrl(Utils.buildConnectionString(configurator.getValue("db_url"), Integer.valueOf(configurator.getValue("db_port")), configurator.getValue("db_name")));
-        dataSource.setUsername(configurator.getValue("db_username"));
-        dataSource.setPassword(configurator.getValue("db_password"));
+        dataSource.setUrl(Utils.buildConnectionString(dbUrl, dbPort, dbName));
+        dataSource.setUsername(dbUsername);
+        dataSource.setPassword(dbPassword);
         return dataSource;
     }
 
-    @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http
-                .csrf(AbstractHttpConfigurer::disable)
-                .sessionManagement(SessionManagementConfigurer::disable)
-                .httpBasic(basic -> {})
-                .authorizeHttpRequests(requests -> requests
-                        .requestMatchers("/api/v1/notes/*")
-                        .authenticated())
-                .logout(LogoutConfigurer::permitAll);
-        return http.build();
-    }
+
 
     @Bean
     public PlatformTransactionManager transactionManager() {
@@ -86,29 +91,5 @@ public class Configurator {
         properties.setProperty("hibernate.dialect", "org.hibernate.dialect.PostgreSQLDialect");
 
         return properties;
-    }
-
-    //|-----------------------------------------------------------------|
-    //|CODE BELOW THIS LINE IS DEPRECATED AND WILL BE REMOVED IN A WHILE|
-    //|-----------------------------------------------------------------|
-
-
-    private static final org.nwolfhub.utils.Configurator configurator = new org.nwolfhub.utils.Configurator(new File("notes.cfg"), getDemoCfg());
-    public static String getDemoCfg() {
-        String text = """
-                    cleanup_rate=12
-                    db_url=127.0.0.1
-                    db_port=5432
-                    db_name=notes
-                    db_username=user
-                    db_password=password
-                    use_redis=true
-                    redis_db_id=1
-                    redis_url=127.0.0.1
-                    redis_port=6379
-                    redis_user=default
-                    redis_password=password
-                    users_dir=users""";
-        return text;
     }
 }
