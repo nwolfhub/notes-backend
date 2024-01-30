@@ -8,7 +8,7 @@ spring:
       resourceserver:
         jwt:
           jwk-set-uri: https://login.nwolfhub.org/realms/id/protocol/openid-connect/certs
-          issuer-uri: https://login.nwolfhub.org/realms/notes
+          issuer-uri: https://login.nwolfhub.org/realms/id
           client: notes
           clientsecret: your-client-secret
 database:

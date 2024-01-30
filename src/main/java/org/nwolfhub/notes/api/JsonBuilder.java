@@ -9,7 +9,7 @@ public class JsonBuilder {
     static String serverName;
     public static String serverInfo = "{\"api_version\": \"1\", \"name\": \"" + serverName + "\"}";
 
-    public static String buildIndirectLogin() {
-
+    public static String buildIndirectLogin(String url) {
+        return "{\"indirect\": 1, \"url\": \"" + url + "\"}";
     }
 }
