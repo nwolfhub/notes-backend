@@ -8,29 +8,17 @@ import org.jetbrains.annotations.NotNull;
 @Table(schema = "notes_updated", name = "users")
 public class User {
     @Id
-    @SequenceGenerator(name = "appsGen", sequenceName = "notes.userid_increaser", allocationSize = 1)
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "appsGen")
-    public Integer id;
-    public String keycloakId;
+    public String id; //should be same as keycloak id
     public String username;
     public String displayName;
 
 
-    public Integer getId() {
+    public String getId() {
         return id;
     }
 
-    public User setId(Integer id) {
+    public User setId(String id) {
         this.id = id;
-        return this;
-    }
-
-    public String getKeycloakId() {
-        return keycloakId;
-    }
-
-    public User setKeycloakId(String keycloakId) {
-        this.keycloakId = keycloakId;
         return this;
     }
 

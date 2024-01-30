@@ -12,4 +12,8 @@ public class JsonBuilder {
     public static String buildIndirectLogin(String url) {
         return "{\"indirect\": 1, \"url\": \"" + url + "\"}";
     }
+
+    public static String buildOk() {
+        return "{\"ok\": 1}";
+    }
 }
