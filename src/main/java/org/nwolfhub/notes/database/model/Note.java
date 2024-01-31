@@ -2,6 +2,8 @@ package org.nwolfhub.notes.database.model;
 
 import jakarta.persistence.*;
 
+import java.util.List;
+
 @Entity
 @Table(schema = "notes_updated", name="notes")
 public class Note {
@@ -12,6 +14,9 @@ public class Note {
     @JoinColumn(name = "id")
     public User owner;
     public String content;
+    @JoinTable(schema = "notes_updated", name = "sharings", joinColumns = @JoinColumn(name = "id"), inverseJoinColumns = @JoinColumn(name = "id"))
+    @ManyToMany
+    public List<PublicShare> sharing;
 
     public String getId() {
         return id;

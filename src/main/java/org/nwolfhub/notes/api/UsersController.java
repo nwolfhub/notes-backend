@@ -3,8 +3,10 @@ package org.nwolfhub.notes.api;
 
 import org.nwolfhub.notes.database.model.User;
 import org.nwolfhub.notes.database.repositories.UserRepository;
+import org.nwolfhub.notes.util.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -20,6 +22,7 @@ import java.util.Optional;
 public class UsersController {
     @Value("${spring.security.oauth2.resourceserver.jwt.issuer-uri}")
     String issuer;
+    private final UserService service;
     public ResponseEntity<String> getLoginData() {
         return ResponseEntity.ok("{\"url\": \"" + issuer + "/protocol/openid-connect/auth?\",");
     }
@@ -27,8 +30,9 @@ public class UsersController {
 
     private final UserRepository repository;
 
-    public UsersController(UserRepository repository) {
+    public UsersController(UserRepository repository, UserService service) {
         this.repository = repository;
+        this.service = service;
     }
 
     @GetMapping("/postLogin")
@@ -37,13 +41,11 @@ public class UsersController {
         if(user.isPresent()) return ResponseEntity.ok(JsonBuilder.buildOk());else {
             logger.info("New user found. Registering in database: " + jwt.getSubject());
             new Thread(() -> {
-                //TODO: register user in db
+                User user1 = service.obtainUserInfoFromKeycloak(jwt);
+                repository.saveAndFlush(user1);
             }).start();
             return ResponseEntity.accepted().body(JsonBuilder.buildOk());
         }
     }
-
-    public ResponseEntity<String> postLogin() {
-
-    }
+    
 }
