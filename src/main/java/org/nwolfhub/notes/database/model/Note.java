@@ -14,7 +14,7 @@ public class Note {
     @JoinColumn(name = "id")
     public User owner;
     public String content;
-    @JoinTable(schema = "notes_updated", name = "sharings", joinColumns = @JoinColumn(name = "id"), inverseJoinColumns = @JoinColumn(name = "id"))
+    @JoinTable(schema = "notes_updated", name = "sharings", joinColumns = @JoinColumn(name = "id"), inverseJoinColumns = @JoinColumn(name = "note-id", referencedColumnName = "id"))
     @ManyToMany
     public List<PublicShare> sharing;
 

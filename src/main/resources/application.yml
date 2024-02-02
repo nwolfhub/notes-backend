@@ -14,7 +14,7 @@ spring:
 database:
   host: 127.0.0.1
   port: 5432
-  name: id
+  name: notes
   credentials:
     username: user
     password: password

@@ -13,7 +13,6 @@ public class NotesApplication {
 	public static void main(String[] args) {
 		cli.addTemplate(Defaults.defaultTemplate);
 		SpringApplication.run(NotesApplication.class, args);
-		AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(Configurator.class);
 	}
 
 }
