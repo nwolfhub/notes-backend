@@ -1,7 +1,12 @@
 package org.nwolfhub.notes.api;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import org.nwolfhub.notes.database.model.User;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
 
 @Component
 public class JsonBuilder {
@@ -15,5 +20,18 @@ public class JsonBuilder {
 
     public static String buildOk() {
         return "{\"ok\": 1}";
+    }
+
+    public static String buildSearchResults(List<User> users) {
+        JsonObject object = new JsonObject();
+        JsonArray array = new JsonArray();
+        for(User user:users) {
+            JsonObject userObject = new JsonObject();
+            userObject.addProperty("name", user.getDisplayName());
+            userObject.addProperty("username", user.getUsername());
+            array.add(userObject);
+        }
+        object.add("users", array);
+        return object.toString();
     }
 }

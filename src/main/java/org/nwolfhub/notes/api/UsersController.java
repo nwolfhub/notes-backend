@@ -13,8 +13,10 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -46,6 +48,13 @@ public class UsersController {
             }).start();
             return ResponseEntity.accepted().body(JsonBuilder.buildOk());
         }
+    }
+
+    @GetMapping("/searchUsers")
+    public ResponseEntity<String> searchUsers(@AuthenticationPrincipal Jwt jwt, @RequestParam(name = "username") String username) {
+        logger.trace(jwt.getSubject() + " requested search for " + username);
+        List<User> users = repository.findUsersByUsernameLikeIgnoreCase(username);
+        return ResponseEntity.ok(JsonBuilder.buildSearchResults(users));
     }
     
 }
