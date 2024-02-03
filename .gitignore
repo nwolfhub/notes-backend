@@ -36,3 +36,4 @@ target/
 notes.cfg
 privileges.cfg
 docker/
+application.yml

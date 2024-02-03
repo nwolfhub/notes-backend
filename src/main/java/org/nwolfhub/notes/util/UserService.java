@@ -28,7 +28,7 @@ public class UserService {
             if(response.isSuccessful()) {
                 User user = new User();
                 JsonObject object = JsonParser.parseString(response.body().string()).getAsJsonObject();
-                user.setUsername(object.get("preffered_username").getAsString());
+                user.setUsername(object.get("preferred_username").getAsString());
                 if(object.has("given_name")) user.setDisplayName(object.get("given_name").getAsString());
                 user.setId(jwt.getSubject());
                 return user;
