@@ -18,3 +18,5 @@ database:
   credentials:
     username: user
     password: password
+users:
+  max-notes: 1000

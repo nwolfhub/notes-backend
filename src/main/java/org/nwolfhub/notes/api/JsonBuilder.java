@@ -2,27 +2,41 @@ package org.nwolfhub.notes.api;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
+import org.nwolfhub.notes.database.model.Note;
 import org.nwolfhub.notes.database.model.User;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 
+/**
+ * JsonBuilder automates json generation
+ */
 @Component
 public class JsonBuilder {
     @Value("${server.name}")
     static String serverName;
     public static String serverInfo = "{\"api_version\": \"1\", \"name\": \"" + serverName + "\"}";
 
+    @NotNull
+    @Contract(pure = true)
     public static String buildIndirectLogin(String url) {
         return "{\"indirect\": 1, \"url\": \"" + url + "\"}";
     }
 
+    @NotNull
+    @Contract(pure = true)
     public static String buildOk() {
         return "{\"ok\": 1}";
     }
 
-    public static String buildSearchResults(List<User> users) {
+    public static String buildErr(String error) {
+        return "{\"ok\": 0, \"error\": \"" + error + "\"}";
+    }
+
+    public static String buildSearchResults(@NotNull List<User> users) {
         JsonObject object = new JsonObject();
         JsonArray array = new JsonArray();
         for(User user:users) {
@@ -32,6 +46,28 @@ public class JsonBuilder {
             array.add(userObject);
         }
         object.add("users", array);
+        return object.toString();
+    }
+
+    public static String buildMe(@NotNull User user) {
+        JsonObject object = new JsonObject();
+        object.addProperty("id", user.getId());
+        object.addProperty("username", user.getUsername());
+        object.addProperty("name", user.getDisplayName());
+        return object.toString();
+    }
+
+    public static String buildNotesList(@NotNull List<Note> notes) {
+        JsonObject object = new JsonObject();
+        JsonArray array = new JsonArray();
+        for(Note note:notes) {
+            JsonObject noteObject = new JsonObject();
+            noteObject.addProperty("id", note.getId());
+            noteObject.addProperty("name", note.getName());
+            noteObject.addProperty("owner", note.getOwner().getId());
+            array.add(noteObject);
+        }
+        object.add("notes", array);
         return object.toString();
     }
 }

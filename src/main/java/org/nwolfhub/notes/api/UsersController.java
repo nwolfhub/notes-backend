@@ -6,7 +6,6 @@ import org.nwolfhub.notes.database.repositories.UserRepository;
 import org.nwolfhub.notes.util.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -53,8 +52,14 @@ public class UsersController {
     @GetMapping("/searchUsers")
     public ResponseEntity<String> searchUsers(@AuthenticationPrincipal Jwt jwt, @RequestParam(name = "username") String username) {
         logger.trace(jwt.getSubject() + " requested search for " + username);
-        List<User> users = repository.findUsersByUsernameLikeIgnoreCase(username);
+        List<User> users = repository.findTop3ByUsernameLikeIgnoreCase(username);
         return ResponseEntity.ok(JsonBuilder.buildSearchResults(users));
+    }
+
+    @GetMapping("/getMe")
+    public ResponseEntity<String> getMe(@AuthenticationPrincipal Jwt jwt) {
+        Optional<User> user = repository.findById(jwt.getSubject());
+        return user.map(value -> ResponseEntity.ok(JsonBuilder.buildMe(value))).orElseGet(() -> ResponseEntity.badRequest().body(JsonBuilder.buildErr("User not found in database. Did you execute postLogin?")));
     }
     
 }
