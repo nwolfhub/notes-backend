@@ -10,9 +10,10 @@ public class Note {
     @Id
     public String id;
     public String name;
-    @OneToOne
-    @JoinColumn(name = "id")
+    @ManyToOne
+    @JoinColumn(name = "owner", referencedColumnName = "id")
     public User owner;
+    @Column(length = 32768)
     public String content;
     @JoinTable(schema = "notes_updated", name = "sharings", joinColumns = @JoinColumn(name = "id"), inverseJoinColumns = @JoinColumn(name = "note-id", referencedColumnName = "id"))
     @ManyToMany
