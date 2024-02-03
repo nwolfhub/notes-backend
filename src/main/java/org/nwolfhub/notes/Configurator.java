@@ -80,13 +80,14 @@ public class Configurator {
         return dataSource;
     }
 
+    @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         // @formatter:off
         http
                 .authorizeHttpRequests((authorize) -> authorize
-                        .requestMatchers(HttpMethod.GET, "/message/**").hasRole("read")
-                        .requestMatchers(HttpMethod.POST, "/message/**").hasRole("write")
-                        .anyRequest().authenticated()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/users/searchUsers").hasRole("notes_search_users")
+                        .requestMatchers(HttpMethod.GET, "/api/v1/users/**").authenticated()
+                        .anyRequest().permitAll()
                 )
                 .oauth2ResourceServer((oauth2) -> oauth2.jwt(jwtConfigurer ->
                         jwtConfigurer.jwtAuthenticationConverter(jwtAuthenticationConverter())));
