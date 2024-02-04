@@ -85,9 +85,10 @@ public class Configurator {
         // @formatter:off
         http
                 .authorizeHttpRequests((authorize) -> authorize
-                        .requestMatchers(HttpMethod.GET, "/api/v1/users/searchUsers").hasRole("notes_search_users")
+                        .requestMatchers(HttpMethod.GET, "/api/v1/users/searchUsers").authenticated()
                         .requestMatchers(HttpMethod.GET, "/api/v1/users/**").authenticated()
-                        .requestMatchers(HttpMethod.POST, "/api/v1/notes/**/edit").hasRole("notes_edit")
+                        .requestMatchers(HttpMethod.POST, "/api/v1/notes/**").authenticated()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/notes/**").authenticated()
                         .anyRequest().permitAll()
                 )
                 .oauth2ResourceServer((oauth2) -> oauth2.jwt(jwtConfigurer ->
