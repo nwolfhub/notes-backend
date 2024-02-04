@@ -87,6 +87,7 @@ public class Configurator {
                 .authorizeHttpRequests((authorize) -> authorize
                         .requestMatchers(HttpMethod.GET, "/api/v1/users/searchUsers").hasRole("notes_search_users")
                         .requestMatchers(HttpMethod.GET, "/api/v1/users/**").authenticated()
+                        .requestMatchers(HttpMethod.POST, "/api/v1/notes/**/edit").hasRole("notes_edit")
                         .anyRequest().permitAll()
                 )
                 .oauth2ResourceServer((oauth2) -> oauth2.jwt(jwtConfigurer ->

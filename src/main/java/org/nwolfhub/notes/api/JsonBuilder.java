@@ -49,12 +49,12 @@ public class JsonBuilder {
         return object.toString();
     }
 
-    public static String buildMe(@NotNull User user) {
+    public static JsonObject buildUser(@NotNull User user) {
         JsonObject object = new JsonObject();
         object.addProperty("id", user.getId());
         object.addProperty("username", user.getUsername());
         object.addProperty("name", user.getDisplayName());
-        return object.toString();
+        return object;
     }
 
     public static String buildNotesList(@NotNull List<Note> notes) {
@@ -68,6 +68,13 @@ public class JsonBuilder {
             array.add(noteObject);
         }
         object.add("notes", array);
+        return object.toString();
+    }
+    public static String buildNote(Note note) {
+        JsonObject object = new JsonObject();
+        object.addProperty("name", note.getName());
+        object.addProperty("content", note.getContent());
+        object.add("owner", buildUser(note.getOwner()));
         return object.toString();
     }
 }
