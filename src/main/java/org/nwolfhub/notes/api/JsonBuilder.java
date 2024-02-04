@@ -77,4 +77,7 @@ public class JsonBuilder {
         object.add("owner", buildUser(note.getOwner()));
         return object.toString();
     }
+    public static String buildNoteCreateOk(String id) {
+        return "{\"id\": \"" + id + "\"}";
+    }
 }

@@ -4,12 +4,15 @@ import jakarta.persistence.*;
 
 import java.util.List;
 
+/**
+ * A note shared to other users
+ */
 @Entity
 @Table(schema = "notes_updated", name = "share")
 public class PublicShare {
     @Id
     public String id;
-    public Integer permission;
+    public Integer permission; //0 - read, 1-edit, 2-delete, reshare (with 1 or less)
     @ManyToOne
     public Note note;
 

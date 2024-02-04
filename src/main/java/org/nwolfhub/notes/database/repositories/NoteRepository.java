@@ -14,4 +14,5 @@ public interface NoteRepository extends JpaRepository<Note, String> {
     List<Note> getNotesByOwner(User owner);
     Optional<Note> findNoteById(String id);
     Optional<Note> findNoteByIdAndOwner(String id, User owner);
+    Integer countByOwner(User owner);
 }

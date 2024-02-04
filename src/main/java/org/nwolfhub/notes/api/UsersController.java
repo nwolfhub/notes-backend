@@ -59,7 +59,11 @@ public class UsersController {
     @GetMapping("/getMe")
     public ResponseEntity<String> getMe(@AuthenticationPrincipal Jwt jwt) {
         Optional<User> user = repository.findById(jwt.getSubject());
-        return user.map(value -> ResponseEntity.ok(JsonBuilder.buildUser(value).toString())).orElseGet(() -> ResponseEntity.badRequest().body(JsonBuilder.buildErr("User not found in database. Did you execute postLogin?")));
+        return user.map(value -> ResponseEntity.ok(JsonBuilder
+                .buildUser(value).toString()))
+                .orElseGet(() -> ResponseEntity
+                .badRequest()
+                .body(JsonBuilder.buildErr("User not found in database. Did you execute postLogin?")));
     }
     
 }
