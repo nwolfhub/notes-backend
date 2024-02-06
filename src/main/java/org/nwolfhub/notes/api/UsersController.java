@@ -51,8 +51,9 @@ public class UsersController {
 
     @GetMapping("/searchUsers")
     public ResponseEntity<String> searchUsers(@AuthenticationPrincipal Jwt jwt, @RequestParam(name = "username") String username) {
+        if(username.length()<2) return ResponseEntity.badRequest().body(JsonBuilder.buildErr("Too short search request"));
         logger.trace(jwt.getSubject() + " requested search for " + username);
-        List<User> users = repository.findTop3ByUsernameLikeIgnoreCase(username);
+        List<User> users = repository.findTop3ByUsernameLikeIgnoreCase("%" + username + "%");
         return ResponseEntity.ok(JsonBuilder.buildSearchResults(users));
     }
 
