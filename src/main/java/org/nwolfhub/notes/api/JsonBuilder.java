@@ -1,58 +1,83 @@
 package org.nwolfhub.notes.api;
 
-import org.nwolfhub.notes.model.Note;
-import org.nwolfhub.notes.model.User;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
+import org.nwolfhub.notes.database.model.Note;
+import org.nwolfhub.notes.database.model.User;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 
+/**
+ * JsonBuilder automates json generation
+ */
+@Component
 public class JsonBuilder {
-    public static String buildOkLoginOutput(String token) {
-        return "{\"token\": \"" + token + "\"}";
-    }
-    public static String buildFailOutput(String error) {
-        return "{\"error\": \"" + error + "\"}";
+    @Value("${server.name}")
+    static String serverName;
+    public static String serverInfo = "{\"api_version\": \"1\", \"name\": \"" + serverName + "\"}";
+
+    @NotNull
+    @Contract(pure = true)
+    public static String buildIndirectLogin(String url) {
+        return "{\"indirect\": 1, \"url\": \"" + url + "\"}";
     }
 
+    @NotNull
+    @Contract(pure = true)
     public static String buildOk() {
-        return "{\"ok\": 1\"}";
+        return "{\"ok\": 1}";
     }
 
-    public static String buildGetMe(User u) {
-        return "{\"user\": \"" + u.username + "\", \"id\": " + u.id + "}";
+    public static String buildErr(String error) {
+        return "{\"ok\": 0, \"error\": \"" + error + "\"}";
     }
 
-    public static String buildGetNote(String note) {
-        return "{\"note\": \"" + note.replace("\"", "\\\"") + "\"}";
+    public static String buildSearchResults(@NotNull List<User> users) {
+        JsonObject object = new JsonObject();
+        JsonArray array = new JsonArray();
+        for(User user:users) {
+            JsonObject userObject = new JsonObject();
+            userObject.addProperty("name", user.getDisplayName());
+            userObject.addProperty("username", user.getUsername());
+            array.add(userObject);
+        }
+        object.add("users", array);
+        return object.toString();
     }
 
-    public static String buildGetNotes(List<Note> notes) {
-        StringBuilder builder = new StringBuilder();
-        builder.append("{\"notes\": [");
-        boolean first = true;
+    public static JsonObject buildUser(@NotNull User user) {
+        JsonObject object = new JsonObject();
+        object.addProperty("id", user.getId());
+        object.addProperty("username", user.getUsername());
+        object.addProperty("name", user.getDisplayName());
+        return object;
+    }
+
+    public static String buildNotesList(@NotNull List<Note> notes) {
+        JsonObject object = new JsonObject();
+        JsonArray array = new JsonArray();
         for(Note note:notes) {
-            if(!first) {
-                builder.append(",");
-            }
-            builder.append("{");
-            builder.append("\"name\": \"").append(note.getName()).append("\",");
-            builder.append("\"encryption\": ").append(note.getEncryptionType());
-            builder.append("}");
-            first=false;
+            JsonObject noteObject = new JsonObject();
+            noteObject.addProperty("id", note.getId());
+            noteObject.addProperty("name", note.getName());
+            noteObject.addProperty("owner", note.getOwner().getId());
+            array.add(noteObject);
         }
-        builder.append("]}");
-        return builder.toString();
+        object.add("notes", array);
+        return object.toString();
     }
-
-    public static String buildPrivilegesList(List<String> privileges) {
-        StringBuilder builder = new StringBuilder("{\"privileges\": [");
-        for(String privilege:privileges) {
-            builder.append("\"").append(privilege).append("\"");
-        }
-        builder.append("]}");
-        return builder.toString();
+    public static String buildNote(Note note) {
+        JsonObject object = new JsonObject();
+        object.addProperty("name", note.getName());
+        object.addProperty("content", note.getContent());
+        object.add("owner", buildUser(note.getOwner()));
+        return object.toString();
     }
-
-    public static String buildDonationServerUrlResponse(String server) {
-        return ("{\"url\": \"" + server + "\"}");
+    public static String buildNoteCreateOk(String id) {
+        return "{\"id\": \"" + id + "\"}";
     }
 }
