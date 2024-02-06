@@ -41,7 +41,7 @@ public class NotesController {
         List<Note> notes = noteRepository.getNotesByOwner(owner);
         return ResponseEntity.ok(JsonBuilder.buildNotesList(notes));
     }
-    @GetMapping("/note/{note}/get")
+    @GetMapping("/{note}/get")
     public ResponseEntity<String> getNote(@AuthenticationPrincipal Jwt jwt, @PathVariable(name = "note") String noteId) {
         Optional<Note> requestedNote = noteRepository.findNoteByIdAndOwner(noteId, new User().setId(jwt.getSubject()));
         if(requestedNote.isPresent()) {
@@ -50,7 +50,7 @@ public class NotesController {
         } else return ResponseEntity.notFound().build();
     }
 
-    @GetMapping("/note/{share-id}/getShared")
+    @GetMapping("/{share-id}/getShared")
     public ResponseEntity<String> getSharedNote(@AuthenticationPrincipal Jwt jwt, @PathVariable(name = "share-id") String shareId) {
         Optional<PublicShare> requestedPublicShare = shareRepository.findById(shareId);
         if(requestedPublicShare.isPresent()) {
@@ -64,7 +64,7 @@ public class NotesController {
         } else return ResponseEntity.notFound().build();
     }
 
-    @PostMapping("/note/{share-id}/editShared")
+    @PostMapping("/{share-id}/editShared")
     public ResponseEntity<String> editSharedNote(@AuthenticationPrincipal Jwt jwt, @PathVariable(name = "share-id") String shareId, @RequestBody String content) {
         Optional<PublicShare> requestedPublicShare = shareRepository.findById(shareId);
         if(requestedPublicShare.isPresent()) {
@@ -79,7 +79,7 @@ public class NotesController {
         } else return ResponseEntity.notFound().build();
     }
 
-    @PostMapping("/note/{note}/edit")
+    @PostMapping("/{note}/edit")
     public ResponseEntity<String> editNote(@AuthenticationPrincipal Jwt jwt, @PathVariable(name = "note") String note, @RequestBody String content) {
         Optional<Note> requested = noteRepository.findNoteByIdAndOwner(note, new User().setId(jwt.getSubject()));
         if(requested.isPresent()) {
@@ -92,7 +92,7 @@ public class NotesController {
         }
     }
 
-    @PostMapping("/note/create")
+    @PostMapping("/create")
     public ResponseEntity<String> createNote(@AuthenticationPrincipal Jwt jwt, @RequestParam(name = "name") String name, @RequestBody String content) {
         Integer currentAmount = noteRepository.countByOwner(new User().setId(jwt.getSubject()));
         if(currentAmount<maxNotes) {
@@ -105,7 +105,7 @@ public class NotesController {
             return ResponseEntity.ok(JsonBuilder.buildNoteCreateOk(noteId));
         } else return ResponseEntity.badRequest().body(JsonBuilder.buildErr("You have hit the notes limit on this server"));
     }
-    @GetMapping("/note/{note}/share")
+    @GetMapping("/{note}/share")
     public ResponseEntity<String> shareNote(@AuthenticationPrincipal Jwt jwt, @PathVariable(name = "note") String id, @RequestParam(name = "user") String user, @RequestParam(name = "permission") Integer permission) {
         if(permission>2 || permission<0) return ResponseEntity.badRequest().body(JsonBuilder.buildErr("Incorrect permission level. Must be [0,2]"));
         Optional<Note> requestedNote = noteRepository.findNoteByIdAndOwner(id, new User().setId(jwt.getSubject()));
