@@ -105,6 +105,15 @@ public class NotesController {
             return ResponseEntity.ok(JsonBuilder.buildNoteCreateOk(noteId));
         } else return ResponseEntity.badRequest().body(JsonBuilder.buildErr("You have hit the notes limit on this server"));
     }
+
+    @GetMapping("/{note}/delete")
+    public ResponseEntity<String> deleteNote(@AuthenticationPrincipal Jwt jwt, @PathVariable (name = "note") String note) {
+        Optional<Note> requested = noteRepository.findNoteByIdAndOwner(note, new User().setId(jwt.getSubject()));
+        if(requested.isPresent()) {
+            noteRepository.delete(requested.get());
+            return ResponseEntity.ok(JsonBuilder.buildOk());
+        } else return ResponseEntity.notFound().build();
+    }
     @GetMapping("/{note}/share")
     public ResponseEntity<String> shareNote(@AuthenticationPrincipal Jwt jwt, @PathVariable(name = "note") String id, @RequestParam(name = "user") String user, @RequestParam(name = "permission") Integer permission) {
         if(permission>2 || permission<0) return ResponseEntity.badRequest().body(JsonBuilder.buildErr("Incorrect permission level. Must be [0,2]"));
