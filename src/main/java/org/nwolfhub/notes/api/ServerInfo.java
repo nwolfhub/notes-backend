@@ -10,9 +10,11 @@ import org.springframework.web.bind.annotation.RestController;
 public class ServerInfo {
     @Value("${spring.security.oauth2.resourceserver.jwt.issuer-uri}")
     String issuer;
+    @Value("${server.name}")
+    String serverName;
     @GetMapping("/info")
     public String getServerInfo() {
-        return JsonBuilder.serverInfo;
+        return JsonBuilder.serverInfo(serverName);
     }
     @GetMapping("/login")
     public String getLoginInfo() {

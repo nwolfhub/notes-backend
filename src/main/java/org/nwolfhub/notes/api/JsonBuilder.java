@@ -16,9 +16,10 @@ import java.util.List;
  */
 @Component
 public class JsonBuilder {
-    @Value("${server.name}")
-    static String serverName;
-    public static String serverInfo = "{\"api_version\": \"1\", \"name\": \"" + serverName + "\"}";
+
+    public static String serverInfo(String serverName) {
+        return "{\"api_version\": \"1\", \"name\": \"" + serverName + "\"}";
+    }
 
     @NotNull
     @Contract(pure = true)
