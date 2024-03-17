@@ -9,6 +9,7 @@ import org.nwolfhub.notes.database.model.User;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import java.text.SimpleDateFormat;
 import java.util.List;
 
 /**
@@ -76,6 +77,8 @@ public class JsonBuilder {
         object.addProperty("name", note.getName());
         object.addProperty("content", note.getContent());
         object.add("owner", buildUser(note.getOwner()));
+        object.addProperty("created", note.getCreated().getTime());
+        object.addProperty("edited", note.getLastEdited().getTime());
         return object.toString();
     }
     public static String buildNoteCreateOk(String id) {

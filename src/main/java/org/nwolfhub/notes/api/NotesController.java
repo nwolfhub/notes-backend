@@ -17,6 +17,7 @@ import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.UnsatisfiedServletRequestParameterException;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -71,7 +72,7 @@ public class NotesController {
             PublicShare publicShare = requestedPublicShare.get();
             if(publicShare.getTo().getId().equals(jwt.getSubject())) {
                 if(publicShare.getPermission()>=1) {
-                    Note note = publicShare.getNote().setContent(content);
+                    Note note = publicShare.getNote().setContent(content).setLastEdited(new Date());
                     noteRepository.save(note);
                     return ResponseEntity.ok(JsonBuilder.buildOk());
                 } else return ResponseEntity.status(HttpStatus.FORBIDDEN).body(JsonBuilder.buildErr("You cannot edit this note"));
@@ -84,7 +85,7 @@ public class NotesController {
         Optional<Note> requested = noteRepository.findNoteByIdAndOwner(note, new User().setId(jwt.getSubject()));
         if(requested.isPresent()) {
             Note resultedNote = requested.get();
-            resultedNote.setContent(content);
+            resultedNote.setContent(content).setLastEdited(new Date());
             noteRepository.save(resultedNote);
             return ResponseEntity.ok(JsonBuilder.buildOk());
         } else {
@@ -100,7 +101,13 @@ public class NotesController {
             while (noteRepository.findNoteById(noteId).isPresent()) {
                 noteId = Utils.generateString(210);
             }
-            Note note = new Note().setId(noteId).setContent(content).setName(name).setOwner(new User().setId(jwt.getSubject()));
+            Note note = new Note()
+                    .setId(noteId)
+                    .setContent(content)
+                    .setName(name)
+                    .setOwner(new User().setId(jwt.getSubject()))
+                    .setCreated(new Date())
+                    .setLastEdited(new Date());
             noteRepository.save(note);
             return ResponseEntity.ok(JsonBuilder.buildNoteCreateOk(noteId));
         } else return ResponseEntity.badRequest().body(JsonBuilder.buildErr("You have hit the notes limit on this server"));

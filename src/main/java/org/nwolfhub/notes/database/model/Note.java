@@ -2,6 +2,7 @@ package org.nwolfhub.notes.database.model;
 
 import jakarta.persistence.*;
 
+import java.util.Date;
 import java.util.List;
 
 @Entity
@@ -18,6 +19,13 @@ public class Note {
     @JoinTable(schema = "notes_updated", name = "sharings", joinColumns = @JoinColumn(name = "id"), inverseJoinColumns = @JoinColumn(name = "note-id", referencedColumnName = "id"))
     @ManyToMany
     public List<PublicShare> sharing;
+
+    @Basic
+    @Temporal(TemporalType.TIME)
+    public Date created;
+    @Basic
+    @Temporal(TemporalType.TIME)
+    public Date lastEdited;
 
     public String getId() {
         return id;
@@ -52,6 +60,33 @@ public class Note {
 
     public Note setContent(String content) {
         this.content = content;
+        return this;
+    }
+
+    public List<PublicShare> getSharing() {
+        return sharing;
+    }
+
+    public Note setSharing(List<PublicShare> sharing) {
+        this.sharing = sharing;
+        return this;
+    }
+
+    public Date getCreated() {
+        return created;
+    }
+
+    public Note setCreated(Date created) {
+        this.created = created;
+        return this;
+    }
+
+    public Date getLastEdited() {
+        return lastEdited;
+    }
+
+    public Note setLastEdited(Date lastEdited) {
+        this.lastEdited = lastEdited;
         return this;
     }
 }
