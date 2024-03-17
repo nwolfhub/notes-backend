@@ -9,6 +9,7 @@ import org.nwolfhub.notes.database.model.User;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import java.text.SimpleDateFormat;
 import java.util.List;
 
 /**
@@ -16,9 +17,10 @@ import java.util.List;
  */
 @Component
 public class JsonBuilder {
-    @Value("${server.name}")
-    static String serverName;
-    public static String serverInfo = "{\"api_version\": \"1\", \"name\": \"" + serverName + "\"}";
+
+    public static String serverInfo(String serverName) {
+        return "{\"api_version\": \"1\", \"name\": \"" + serverName + "\"}";
+    }
 
     @NotNull
     @Contract(pure = true)
@@ -75,6 +77,8 @@ public class JsonBuilder {
         object.addProperty("name", note.getName());
         object.addProperty("content", note.getContent());
         object.add("owner", buildUser(note.getOwner()));
+        object.addProperty("created", note.getCreated());
+        object.addProperty("edited", note.getLastEdited());
         return object.toString();
     }
     public static String buildNoteCreateOk(String id) {
