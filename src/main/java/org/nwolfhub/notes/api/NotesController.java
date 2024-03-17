@@ -72,7 +72,7 @@ public class NotesController {
             PublicShare publicShare = requestedPublicShare.get();
             if(publicShare.getTo().getId().equals(jwt.getSubject())) {
                 if(publicShare.getPermission()>=1) {
-                    Note note = publicShare.getNote().setContent(content).setLastEdited(new Date());
+                    Note note = publicShare.getNote().setContent(content).setLastEdited(new Date().getTime());
                     noteRepository.save(note);
                     return ResponseEntity.ok(JsonBuilder.buildOk());
                 } else return ResponseEntity.status(HttpStatus.FORBIDDEN).body(JsonBuilder.buildErr("You cannot edit this note"));
@@ -85,7 +85,7 @@ public class NotesController {
         Optional<Note> requested = noteRepository.findNoteByIdAndOwner(note, new User().setId(jwt.getSubject()));
         if(requested.isPresent()) {
             Note resultedNote = requested.get();
-            resultedNote.setContent(content).setLastEdited(new Date());
+            resultedNote.setContent(content).setLastEdited(new Date().getTime());
             noteRepository.save(resultedNote);
             return ResponseEntity.ok(JsonBuilder.buildOk());
         } else {
@@ -106,8 +106,8 @@ public class NotesController {
                     .setContent(content)
                     .setName(name)
                     .setOwner(new User().setId(jwt.getSubject()))
-                    .setCreated(new Date())
-                    .setLastEdited(new Date());
+                    .setCreated(new Date().getTime())
+                    .setLastEdited(new Date().getTime());
             noteRepository.save(note);
             return ResponseEntity.ok(JsonBuilder.buildNoteCreateOk(noteId));
         } else return ResponseEntity.badRequest().body(JsonBuilder.buildErr("You have hit the notes limit on this server"));

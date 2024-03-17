@@ -77,8 +77,8 @@ public class JsonBuilder {
         object.addProperty("name", note.getName());
         object.addProperty("content", note.getContent());
         object.add("owner", buildUser(note.getOwner()));
-        object.addProperty("created", note.getCreated().getTime());
-        object.addProperty("edited", note.getLastEdited().getTime());
+        object.addProperty("created", note.getCreated());
+        object.addProperty("edited", note.getLastEdited());
         return object.toString();
     }
     public static String buildNoteCreateOk(String id) {

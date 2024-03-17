@@ -20,12 +20,8 @@ public class Note {
     @ManyToMany
     public List<PublicShare> sharing;
 
-    @Basic
-    @Temporal(TemporalType.TIME)
-    public Date created;
-    @Basic
-    @Temporal(TemporalType.TIME)
-    public Date lastEdited;
+    public Long created;
+    public Long lastEdited;
 
     public String getId() {
         return id;
@@ -72,20 +68,20 @@ public class Note {
         return this;
     }
 
-    public Date getCreated() {
+    public Long getCreated() {
         return created;
     }
 
-    public Note setCreated(Date created) {
+    public Note setCreated(Long created) {
         this.created = created;
         return this;
     }
 
-    public Date getLastEdited() {
+    public Long getLastEdited() {
         return lastEdited;
     }
 
-    public Note setLastEdited(Date lastEdited) {
+    public Note setLastEdited(Long lastEdited) {
         this.lastEdited = lastEdited;
         return this;
     }
