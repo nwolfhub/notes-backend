@@ -81,11 +81,12 @@ public class NotesController {
     }
 
     @PostMapping("/{note}/edit")
-    public ResponseEntity<String> editNote(@AuthenticationPrincipal Jwt jwt, @PathVariable(name = "note") String note, @RequestBody String content) {
+    public ResponseEntity<String> editNote(@AuthenticationPrincipal Jwt jwt, @PathVariable(name = "note") String note, @RequestParam(name = "name", required = false) String name, @RequestBody String content) {
         Optional<Note> requested = noteRepository.findNoteByIdAndOwner(note, new User().setId(jwt.getSubject()));
         if(requested.isPresent()) {
             Note resultedNote = requested.get();
             resultedNote.setContent(content).setLastEdited(new Date().getTime());
+            if(name!=null) resultedNote.setName(name);
             noteRepository.save(resultedNote);
             return ResponseEntity.ok(JsonBuilder.buildOk());
         } else {
