@@ -74,6 +74,7 @@ public class JsonBuilder {
     }
     public static String buildNote(Note note) {
         JsonObject object = new JsonObject();
+        object.addProperty("id", note.getId());
         object.addProperty("name", note.getName());
         object.addProperty("content", note.getContent());
         object.add("owner", buildUser(note.getOwner()));
